@@ -5,6 +5,17 @@ using SFML.Window;
 
 namespace Wolstencroft
 {
+    static class WMaths
+    {
+        //find the square root 
+        static public Vector2f Normalize(Vector2f input)
+        {
+            float fLength = MathF.Sqrt((input.X * input.X) + (input.Y * input.Y));
+
+            return (input / fLength);
+            
+        }
+    }
 
     class Component
     {
@@ -31,9 +42,17 @@ namespace Wolstencroft
     {
         RectangleShape Body = new RectangleShape();
 
+        public Vector2f Size = new Vector2f(10,10);
+
+        public Renderable()
+        {
+            Body.Size = Size;
+        }
+
         public override void OnUpdate()
         {
-            Body.Position = entity.GetComponent<Transform2D>().position;
+            Body.Position = entity.transform.position;
+            Body.Rotation = entity.transform.fRotation;
             Game.Instance.Draw(Body);
         }
     }
