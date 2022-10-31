@@ -15,12 +15,24 @@ namespace Wolstencroft
             return (input / fLength);
             
         }
+
+        static public float Lerp(float a, float b, float T)
+        {
+            return (1-T)*a + b*T;
+        }
+        
+        static public Vector2f Lerp(Vector2f a, Vector2f b, float T)
+        {
+            return (1-T)*a + b*T;
+        }
+
     }
 
     class Component
     {
         protected Game game;
         public Entity entity { get; private set; }
+        public Transform2D transform;
 
 
         public virtual void OnUpdate() { }
@@ -34,6 +46,7 @@ namespace Wolstencroft
         public void SetEntityParent(ref Entity entity)
         {
             this.entity = entity;
+            transform = entity.transform;
         }
 
     }
@@ -67,8 +80,8 @@ namespace Wolstencroft
     {
         public List<Component> components = new List<Component>();
         public Transform2D transform;
-
-        private Entity entityRef;
+        public string Name = "Entity";
+        private Entity entityRef ;
 
 
         public Entity()
@@ -76,14 +89,14 @@ namespace Wolstencroft
             entityRef = this;
             //add transform2d by default
             transform = AddComponent<Transform2D>();
-            
+            Name = this.ToString();
         }
 
         public void RunStarts()
         {
-            foreach (var Comp in components)
+            for (int i = 0; i < components.Count; i++)
             {
-                Comp.OnStart();
+                components[i].OnStart();
             }
         }
         public void RunUpdates()
@@ -126,7 +139,7 @@ namespace Wolstencroft
     class Game
     {
 
-
+        
         public static Game Instance = null;
 
         public RenderWindow window;
@@ -136,7 +149,7 @@ namespace Wolstencroft
         public string sName = "Window";
         List<Entity> Entitys = new List<Entity>();
 
-        public Keyboard.Key CurrentPressedKey;
+        static Clock RunTimeClock = new Clock();
 
         public Game()
         {
@@ -147,13 +160,14 @@ namespace Wolstencroft
 
         public void Draw(SFML.Graphics.Drawable drawable)
         {
-            if (window != null || drawable != null)
+            if (window != null && drawable != null)
                 window.Draw(drawable);
         }
 
 
         public void Start()
         {
+            RunTimeClock.Restart();
             window.Closed += HandleClose;
             window.KeyPressed += HandleKeyPress;
 
@@ -185,14 +199,15 @@ namespace Wolstencroft
         }
         void HandleEntityUpdates()
         {
-            foreach (var Ent in Entitys)
+            for(int i = 0; i < Entitys.Count; i++)
             {
-                Ent.RunUpdates();
+                Entitys[i].RunUpdates();
             }
         }
 
         public void AddEntity(Entity entity)
         {
+            Log($"Added: {( entity.Name)}");
             entity.RunStarts();
             Entitys.Add(entity);
 
@@ -200,12 +215,21 @@ namespace Wolstencroft
 
         void HandleKeyPress(object sender, SFML.Window.KeyEventArgs e)
         {
-            CurrentPressedKey = e.Code;
         }
 
-        public void Log<T>(T Data)
+        static public bool IsKeyPressed(SFML.Window.Keyboard.Key key)
         {
-            Console.WriteLine($"[{Data}]");
+            return SFML.Window.Keyboard.IsKeyPressed(key);
+        }
+
+        static public void Log<T>(T Data)
+        {
+            Console.WriteLine($"[{RunTimeClock.ElapsedTime.AsSeconds()}][{Data}]");
+        }
+        
+        static public Time GetTime()
+        {
+            return RunTimeClock.ElapsedTime;
         }
 
     };
