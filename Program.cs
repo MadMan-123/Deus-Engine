@@ -6,6 +6,7 @@ using SFML.Window;
 
 class Program
 {
+    #region CustomComponents
     class PlayerController : Component
     {
         float fAxisY = 0;
@@ -45,36 +46,35 @@ class Program
     {
         public Vector2f DirectionToFire;
         public float fSpeed = .25f;
+        public float fTimeToWait = 5f;
+
+        public override void OnStart()
+        {
+            DestroyObject();
+        }
 
         public override void OnUpdate()
         {
+            
             transform.position -= DirectionToFire * fSpeed;
         }
 
-
-    }
-
-    class ProjectileOBJ : Entity
-    {
-        public Projectile projectile;
-        public ProjectileOBJ()
+        async void DestroyObject()
         {
-            projectile = AddComponent<Projectile>();
-            AddComponent<Renderable>();
-
-            
+            await Task.Delay((int)(fTimeToWait * 1000f));
+            Game.Instance.Destroy(entity);
 
         }
-    }
 
+    }
 
     class ProjectileHandler : Component
     {
         public Vector2f DirectionToFire;
 
-        int iTimer = 0;
-        int iMax = 1000;
         bool bCanFire = true;
+        public float fTimeToWait = 0.25f;
+
 
         public override void OnStart()
         {
@@ -86,38 +86,65 @@ class Program
 
             if (Mouse.IsButtonPressed(Mouse.Button.Left) && bCanFire)
             {
-                iTimer = 0;
-                bCanFire = false;
-                ProjectileOBJ projectile = new ProjectileOBJ();
-                projectile.transform.position = transform.position;
-                projectile.projectile.DirectionToFire = DirectionToFire;
-                Game.Instance.AddEntity(projectile);
-                
-
+                Shoot();
             }
+        }
 
-            if (!bCanFire)
-            {
-                iTimer += 1;
-                bCanFire = iTimer > iMax;
-            }
-
-
+        async void Shoot()
+        {
+            bCanFire = false;
+            ProjectileOBJ projectile = new ProjectileOBJ();
+            projectile.transform.position = transform.position;
+            projectile.projectile.DirectionToFire = DirectionToFire;
+            Game.Instance.AddEntity(projectile);
+            await Task.Delay((int)(fTimeToWait * 1000f));
+            bCanFire = true;
 
         }
     }
 
+    #endregion
+    #region CustomEntities
+    class ProjectileOBJ : Entity
+    {
+        public Projectile projectile;
+        public Renderable renderable;
+        public ProjectileOBJ()
+        {
+            //reference the projectile
+            projectile = AddComponent<Projectile>();
+            renderable = AddComponent<Renderable>();
+
+            transform.size = new Vector2f(5,5);
+        }
+    }
+
+    class Player : Entity
+    {
+        PlayerController playerController;
+        Renderable renderable;
+        ProjectileHandler projectileHandler;
+
+        public Player()
+        {
+            playerController = AddComponent<PlayerController>();
+            renderable = AddComponent<Renderable>();
+            projectileHandler = AddComponent<ProjectileHandler>();
+
+            transform.size = new Vector2f(10, 10);
+
+            transform.position += transform.size / 2;
+            
+        }
+    }
+
+    #endregion
 
     static Game game = new Game();
     static void Main()
     {
-        Entity Player = new Entity();
-        Player.AddComponent<PlayerController>();
-        Player.AddComponent<Renderable>();
-        Player.AddComponent<ProjectileHandler>();
-
-        game.AddEntity(Player);
-
+        Player player = new Player();
+        game.AddEntity(player);
   
         Game.Log(WMaths.Lerp(new Vector2f(0, 0), new Vector2f(10, 10), .5f));
 
