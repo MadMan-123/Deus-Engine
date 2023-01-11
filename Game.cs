@@ -3,6 +3,7 @@ using SFML.System;
 using SFML.Audio;
 using SFML.Window;
 
+
 namespace Wolstencroft
 {
     #region Maths
@@ -63,7 +64,7 @@ namespace Wolstencroft
     //to render on screen 
     class Renderable : Component
     {
-        RectangleShape Body = new RectangleShape();
+        public RectangleShape Body = new RectangleShape();
 
 
         public Renderable()
@@ -85,6 +86,84 @@ namespace Wolstencroft
         public Vector2f position = new Vector2f(0, 0);
         public Vector2f size = new Vector2f(0, 0);
         public float fRotation = 0f;
+    }
+    
+    class Collider2D : Component
+    {
+        public FloatRect Collider;
+
+        Action<Collider2D> OnCollisionEvent;
+        Collider2D()
+        {
+            OnCollisionEvent += OnCollision2D;
+        }
+        public bool bIsColiding(Collider2D collider)
+        {
+            if (Collider.Intersects(collider.Collider))
+            {
+                OnCollisionEvent?.Invoke(this);
+                return true;
+            }
+            return false;
+
+        }
+
+        public virtual void OnCollision2D(Collider2D collider)
+        {
+            Game.Log("Collided");
+        }
+    };
+    class ColliderManager : Component
+    {
+        List<Collider2D> colliders = new List<Collider2D>();
+
+        public override void OnStart()
+        {
+
+
+        }
+
+        void CheckAllForCollision()
+        {
+
+        }
+
+    }
+    class EntityManager : Component
+    {
+        public List<Entity> Entitys = new List<Entity>();
+        public void HandleEntityUpdates()
+        {
+            for (int i = 0; i < Entitys.Count; i++)
+            {
+                Entitys[i].RunUpdates();
+            }
+        }
+
+        public Entity AddEntity(Entity entity)
+        {
+            Game.Log($"Added: {(entity.Name)}");
+            entity.RunStarts();
+            Entitys.Add(entity);
+
+            return entity;
+        }
+
+        public void Destroy(Entity entity)
+        {
+            Game.Log($"Destroying: {entity.Name}");
+
+            for (int i = 0; i < Entitys.Count; i++)
+            {
+                if (entity == Entitys[i])
+                {
+                    Entitys.RemoveAt(i);
+                    GC.Collect();
+                    GC.SuppressFinalize(this);
+
+                }
+            }
+        }
     }
     #endregion
     #region Entity
@@ -128,6 +207,7 @@ namespace Wolstencroft
             T NewComp = new T();
             NewComp.SetEntityParent(ref entityRef);
             components.Add(NewComp);
+
             return NewComp;
         }
 
@@ -151,30 +231,44 @@ namespace Wolstencroft
 
 
     };
+
+    class EntityManagerOBJ : Entity
+    {
+        public EntityManager entityManager;
+
+
+
+        public EntityManagerOBJ()
+        {
+            entityManager = AddComponent<EntityManager>();
+        }
+    }
+   
+   
     #endregion
     #region Game
 
     //main game logic
     class Game
     {
-
-        
         public static Game Instance = null;
 
         public RenderWindow window;
 
-        public uint iWidth = 200, iHeight = 200;
+        public uint iWidth = 400, iHeight = 400;
 
         public string sName = "Window";
-        List<Entity> Entitys = new List<Entity>();
 
         static Clock RunTimeClock = new Clock();
+
+        public static EntityManagerOBJ Entities;
 
         public Game()
         {
             if (Instance == null)
                 Instance = this;
             window = new RenderWindow(new VideoMode(iWidth, iHeight), sName);
+            Entities = new EntityManagerOBJ();
         }
 
         public void Draw(SFML.Graphics.Drawable drawable)
@@ -216,37 +310,7 @@ namespace Wolstencroft
 
 
         }
-        void HandleEntityUpdates()
-        {
-            for(int i = 0; i < Entitys.Count; i++)
-            {
-                Entitys[i].RunUpdates();
-            }
-        }
-
-        public void AddEntity(Entity entity)
-        {
-            Log($"Added: {( entity.Name)}");
-            entity.RunStarts();
-            Entitys.Add(entity);
-
-        }
-
-        public void Destroy(Entity entity)
-        {
-            Log($"Destroying: {entity.Name}");
-            
-            for (int i = 0; i < Entitys.Count; i++)
-            {
-                if(entity == Entitys[i])
-                {
-                    Entitys.RemoveAt(i);
-                    GC.Collect();
-                    GC.SuppressFinalize(this);
-
-                }
-            }
-        }
+      
 
         void HandleKeyPress(object sender, SFML.Window.KeyEventArgs e)
         {
@@ -265,6 +329,21 @@ namespace Wolstencroft
         static public Time GetTime()
         {
             return RunTimeClock.ElapsedTime;
+        }
+
+        public static Entity Instantiate( Entity entity)
+        {
+            Entities.entityManager.AddEntity(entity);
+
+            return entity;
+        }
+        public static void Destroy(Entity entity)
+        {
+            Entities.entityManager.Destroy(entity);
+        }
+        static void HandleEntityUpdates()
+        {
+            Entities.entityManager.HandleEntityUpdates();
         }
 
     };
