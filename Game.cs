@@ -31,6 +31,8 @@ namespace Wolstencroft
             return (1-T)*a + b*T;
         }
 
+        static public Vector2i V2FtoV2I(Vector2f input) => new Vector2i((int)input.X, (int)input.Y);
+
     }
     #endregion
     #region Component
@@ -91,29 +93,36 @@ namespace Wolstencroft
     class Collider2D : Component
     {
         public FloatRect Collider;
+        bool bIsColiding = false;
 
-        Action<Collider2D> OnCollisionEvent;
-        Collider2D()
+        public Action<Collider2D> OnCollisionEvent;
+        public Action<Collider2D> OnExitCollisionEvent;
+        public Collider2D()
         {
-            OnCollisionEvent += OnCollision2D;
         }
-        public bool bIsColiding(Collider2D collider)
+
+        public override void OnUpdate()
         {
-            if (Collider.Intersects(collider.Collider))
+            Collider = new FloatRect(transform.position, (transform.size));
+        }
+        public bool IsColiding(Collider2D collider)
+        {
+            Game.Log(bIsColiding && Collider.Intersects(collider.Collider));
+            if (!bIsColiding &&  Collider.Intersects(collider.Collider) == true)
             {
                 OnCollisionEvent?.Invoke(this);
-                return true;
+                bIsColiding = true;
             }
-            return false;
+            else if(bIsColiding && Collider.Intersects(collider.Collider) == false)
+            {
+                OnExitCollisionEvent?.Invoke(this);
+                bIsColiding = false;
+            }
+            return bIsColiding;
 
         }
 
-        public virtual void OnCollision2D(Collider2D collider)
-        {
-            Game.Log("Collided");
-        }
-    };
-    class ColliderManager : Component
+    }    class ColliderManager : Component
     {
         List<Collider2D> colliders = new List<Collider2D>();
 
@@ -123,27 +132,67 @@ namespace Wolstencroft
 
         }
 
-        void CheckAllForCollision()
+        public void AddCollider(Entity entity)
         {
+            Collider2D col = entity.GetComponent<Collider2D>();
+            if (col != null)
+            {
+                colliders.Add(col);
+                Game.Log("Collision added");
 
+            }
+        }
+
+        public void AddCollider(Collider2D col)
+        {
+            colliders.Add(col);
+        }
+
+        public void CheckAllForCollision()
+        {
+            foreach(Collider2D col in colliders)
+            {
+                foreach (Collider2D colx in colliders)
+                {
+                    //check if current collision is the same as comparing
+                    if (colx == col) continue;
+
+                    bool bProduct = col.IsColiding(colx);
+                    
+                }
+            }
         }
 
     }
     class EntityManager : Component
     {
         public List<Entity> Entitys = new List<Entity>();
+        ColliderManager colliderManager = new ColliderManager();
+
         public void HandleEntityUpdates()
         {
+            HandlePhysicsUpdates();
+
             for (int i = 0; i < Entitys.Count; i++)
             {
                 Entitys[i].RunUpdates();
             }
+
+        }
+
+        public void HandlePhysicsUpdates()
+        {
+            colliderManager.CheckAllForCollision();
         }
 
         public Entity AddEntity(Entity entity)
         {
             Game.Log($"Added: {(entity.Name)}");
             entity.RunStarts();
+
+            //attempt to add a collider to the manager
+            colliderManager.AddCollider(entity);
+
             Entitys.Add(entity);
 
             return entity;
@@ -261,7 +310,7 @@ namespace Wolstencroft
 
         static Clock RunTimeClock = new Clock();
 
-        public static EntityManagerOBJ Entities;
+        public EntityManagerOBJ Entities;
 
         public Game()
         {
@@ -331,19 +380,20 @@ namespace Wolstencroft
             return RunTimeClock.ElapsedTime;
         }
 
-        public static Entity Instantiate( Entity entity)
+        public static Entity Instantiate(Entity entity)
         {
-            Entities.entityManager.AddEntity(entity);
+            if (Instance.Entities != null)
+                Instance.Entities.entityManager.AddEntity(entity);
 
             return entity;
         }
         public static void Destroy(Entity entity)
         {
-            Entities.entityManager.Destroy(entity);
+            Instance.Entities.entityManager.Destroy(entity);
         }
         static void HandleEntityUpdates()
         {
-            Entities.entityManager.HandleEntityUpdates();
+            Instance.Entities.entityManager.HandleEntityUpdates();
         }
 
     };
