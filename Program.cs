@@ -11,7 +11,7 @@ class Program
 
     class PlayerController : Component
     {
-        float fAxisY = 0 , fAxisX = 0;
+        float fAxisY = 0, fAxisX = 0;
 
         float fSpeed = .05f;
         float fScale = 0.025f;
@@ -30,7 +30,7 @@ class Program
                 fAxisY = 0;
             }
 
-            if(Game.IsKeyPressed(Keyboard.Key.D))
+            if (Game.IsKeyPressed(Keyboard.Key.D))
             {
                 fAxisX += fScale;
             }
@@ -61,7 +61,7 @@ class Program
     class Projectile : Component
     {
         public Vector2f DirectionToFire;
-        public float fSpeed = .25f;
+        public float fSpeed = 100f;
         public float fTimeToWait = 2f;
 
         public override void OnStart()
@@ -72,7 +72,7 @@ class Program
         public override void OnUpdate()
         {
 
-            transform.position -= DirectionToFire * fSpeed;
+            transform.position -= DirectionToFire * fSpeed * Game.DeltaTime.AsSeconds();
         }
 
         async void DestroyObject()
@@ -126,11 +126,15 @@ class Program
     {
         public Projectile projectile;
         public Renderable renderable;
+        Collider2D collider;
+
         public ProjectileOBJ()
         {
             //reference the projectile
             projectile = AddComponent<Projectile>();
             renderable = AddComponent<Renderable>();
+            collider = AddComponent<Collider2D>();
+
 
             transform.size = new Vector2f(5, 5);
         }
@@ -219,4 +223,3 @@ class Program
 
 
 };
-

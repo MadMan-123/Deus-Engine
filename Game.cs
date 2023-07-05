@@ -2,7 +2,8 @@ using SFML.Graphics;
 using SFML.System;
 using SFML.Audio;
 using SFML.Window;
-
+using static System.Reflection.Metadata.BlobBuilder;
+using System.Diagnostics;
 
 namespace Wolstencroft
 {
@@ -16,19 +17,19 @@ namespace Wolstencroft
             float fLength = MathF.Sqrt((input.X * input.X) + (input.Y * input.Y));
 
             return (input / fLength);
-            
+
         }
 
         //float lerp 
         static public float Lerp(float a, float b, float T)
         {
-            return (1-T)*a + b*T;
+            return (1 - T) * a + b * T;
         }
-        
+
         //vector lerp
         static public Vector2f Lerp(Vector2f a, Vector2f b, float T)
         {
-            return (1-T)*a + b*T;
+            return (1 - T) * a + b * T;
         }
 
         static public Vector2i V2FtoV2I(Vector2f input) => new Vector2i((int)input.X, (int)input.Y);
@@ -89,7 +90,7 @@ namespace Wolstencroft
         public Vector2f size = new Vector2f(0, 0);
         public float fRotation = 0f;
     }
-    
+
     class Collider2D : Component
     {
         public FloatRect Collider;
@@ -97,39 +98,66 @@ namespace Wolstencroft
 
         public Action<Collider2D> OnCollisionEvent;
         public Action<Collider2D> OnExitCollisionEvent;
+
+        private ColliderManager collisions = new ColliderManager();
         public Collider2D()
         {
         }
 
         public override void OnUpdate()
         {
-            Collider = new FloatRect(transform.position, (transform.size));
+            Collider.Left = transform.position.X;
+            Collider.Top = transform.position.Y;
+            Collider.Width = transform.size.X;
+            Collider.Height = transform.size.Y;
+
         }
+
         public bool IsColiding(Collider2D collider)
         {
-            Game.Log(bIsColiding && Collider.Intersects(collider.Collider));
-            if (!bIsColiding &&  Collider.Intersects(collider.Collider) == true)
+            //check if the collisions in the collider are still in
+            List<bool> bCols = collisions.CheckAndReturnAllForCollision();
+            bool bTemp = Collider.Intersects(collider.Collider);
+            if (bTemp && !collisions.colliders.Any(c => c == collider))
             {
+                //log that entity was added
+                Game.Log($"{collider}: Added");
+                //add the collider
+                collisions.AddCollider(collider);
+                //invoke on collide
                 OnCollisionEvent?.Invoke(this);
-                bIsColiding = true;
+
             }
-            else if(bIsColiding && Collider.Intersects(collider.Collider) == false)
+            else if (!bTemp && collisions.colliders.Any(c => c == collider))
             {
+                //log that entity was removed
+                Game.Log($"{collider}: Removed");
+                //remove the collider
+                collisions.RemoveCollider(collider);
+                //invoke on collide
                 OnExitCollisionEvent?.Invoke(this);
-                bIsColiding = false;
             }
-            return bIsColiding;
+
+            return bTemp;
 
         }
 
-    }    class ColliderManager : Component
+    }
+
+    class ColliderManager : Component
     {
-        List<Collider2D> colliders = new List<Collider2D>();
+        public List<Collider2D> colliders = new List<Collider2D>();
 
         public override void OnStart()
         {
 
 
+        }
+
+        public void RemoveCollider(Collider2D col)
+        {
+            if (colliders.Contains(col))
+                colliders.Remove(col);
         }
 
         public void AddCollider(Entity entity)
@@ -145,29 +173,93 @@ namespace Wolstencroft
 
         public void AddCollider(Collider2D col)
         {
+            if (colliders.Contains(col))
+                return;
+
             colliders.Add(col);
         }
 
+
         public void CheckAllForCollision()
         {
-            foreach(Collider2D col in colliders)
+            int colliderCount = colliders.Count;
+            for (int i = 0; i < colliderCount; i++)
             {
-                foreach (Collider2D colx in colliders)
+                Collider2D col = colliders[i];
+                for (int j = i + 1; j < colliderCount; j++)
                 {
-                    //check if current collision is the same as comparing
-                    if (colx == col) continue;
-
+                    Collider2D colx = colliders[j];
                     bool bProduct = col.IsColiding(colx);
-                    
                 }
             }
+        }
+
+        public List<bool> CheckAndReturnAllForCollision()
+        {
+            List<bool> bIsColidingList = new List<bool>();
+            int colliderCount = colliders.Count;
+            for (int i = 0; i < colliderCount; i++)
+            {
+                Collider2D col = colliders[i];
+                for (int j = i + 1; j < colliderCount; j++)
+                {
+                    Collider2D colx = colliders[j];
+                    bool bProduct = col.IsColiding(colx);
+                    bIsColidingList.Add(bProduct);
+                }
+            }
+
+            return bIsColidingList;
         }
 
     }
     class EntityManager : Component
     {
         public List<Entity> Entitys = new List<Entity>();
+        public List<Entity> EntitysToBeDestroyed = new List<Entity>();
+        public float fSeccondsToCleanUp = 5f;
+        bool bCanClean = true;
         ColliderManager colliderManager = new ColliderManager();
+
+
+        public override void OnStart()
+        {
+        }
+
+
+
+        public async void CleanUp()
+        {
+            if (!bCanClean || EntitysToBeDestroyed.Count == 0)
+                return;
+
+
+            //set the bool false 
+            bCanClean = false;
+
+            Game.Log("Start Clean Memory");
+
+
+            //for each entity remove it from the list
+            for (int i = 0; i < EntitysToBeDestroyed.Count; i++)
+            {
+                EntitysToBeDestroyed.RemoveAt(i);
+            }
+
+
+            //collect the memory
+            GC.Collect();
+            GC.SuppressFinalize(this);
+
+            //remove any null elements
+            EntitysToBeDestroyed.TrimExcess();
+
+            await Task.Delay((int)(fSeccondsToCleanUp * 1000f));
+
+            bCanClean = true;
+
+
+        }
 
         public void HandleEntityUpdates()
         {
@@ -175,7 +267,8 @@ namespace Wolstencroft
 
             for (int i = 0; i < Entitys.Count; i++)
             {
-                Entitys[i].RunUpdates();
+                if (Entitys[i] != null)
+                    Entitys[i].RunUpdates();
             }
 
         }
@@ -200,18 +293,19 @@ namespace Wolstencroft
 
         public void Destroy(Entity entity)
         {
-            Game.Log($"Destroying: {entity.Name}");
+            Game.Log($"Added: {entity.Name} To Be Destroyed");
+            //remove entity from list
+            Entitys.Remove(entity);
+            //clean up list
+            Entitys.TrimExcess();
 
-            for (int i = 0; i < Entitys.Count; i++)
-            {
-                if (entity == Entitys[i])
-                {
-                    Entitys.RemoveAt(i);
-                    GC.Collect();
-                    GC.SuppressFinalize(this);
+            //add entity to list of entitys to be destroyed but disable it from view
+            EntitysToBeDestroyed.Add(entity);
+        }
 
-                }
-            }
+        private void SetBackCleanUp(float fSeccondToAdd)
+        {
+            fSeccondsToCleanUp += fSeccondToAdd;
         }
     }
     #endregion
@@ -221,7 +315,9 @@ namespace Wolstencroft
         public List<Component> components = new List<Component>();
         public Transform2D transform;
         public string Name = "Entity";
-        private Entity entityRef ;
+        private Entity entityRef;
+        public List<String> sTags = new List<String>();
+        public List<String> sIgnoreTags = new List<String>();
 
 
         public Entity()
@@ -229,7 +325,7 @@ namespace Wolstencroft
             entityRef = this;
             //add transform2d by default
             transform = AddComponent<Transform2D>();
-            if(this != null)
+            if (this != null)
                 Name = ToString();
         }
 
@@ -278,6 +374,9 @@ namespace Wolstencroft
 
         }
 
+        public bool CompareTag(string sTag) => sTags.Any(s => s == sTag);
+
+        public bool CompareTags(List<string> strings) => sTags.Any(x => strings.Any(y => EqualityComparer<string>.Default.Equals(x, y)));
 
     };
 
@@ -292,8 +391,8 @@ namespace Wolstencroft
             entityManager = AddComponent<EntityManager>();
         }
     }
-   
-   
+
+
     #endregion
     #region Game
 
@@ -311,6 +410,22 @@ namespace Wolstencroft
         static Clock RunTimeClock = new Clock();
 
         public EntityManagerOBJ Entities;
+
+        static public Time DeltaTime;
+
+        static public int FPS;
+        private Clock fpsClock;
+
+        private int frameCount = 0;
+        private Clock frameTimer = new Clock();
+
+        static public Font EngineFont = new Font("F:\\Dev\\WolstencroftEngine\\consolas\\consola.ttf");
+
+        protected static bool bShouldLog = false;
+        Process currentProcess;
+        long memoryUsageBytes = 0;
+        double memoryUsageMB = 0;
+
 
         public Game()
         {
@@ -333,21 +448,67 @@ namespace Wolstencroft
             window.Closed += HandleClose;
             window.KeyPressed += HandleKeyPress;
 
+            OnStart();
+
             HandleUpdate();
         }
 
+        static uint iSize = 20;
+
+        Text FPSCounter = new Text("", EngineFont, iSize);
+        Text EntityCount = new Text("", EngineFont, iSize);
+        Text EntitiesToDestroyCount = new Text("", EngineFont, iSize);
+        Text MemoryCounter = new Text("", EngineFont, iSize);
         void HandleUpdate()
         {
+            Clock clock = new Clock();
+            fpsClock = new Clock();
 
+            EntityCount.Position = new Vector2f(0, 20);
+            EntitiesToDestroyCount.Position = new Vector2f(0, 40);
+            MemoryCounter.Position = new Vector2f(0, 60);
             while (window.IsOpen)
             {
+                currentProcess = Process.GetCurrentProcess();
+                DeltaTime = clock.Restart();
                 window.DispatchEvents();
                 window.Clear();
+
+                //call game update
+                OnUpdate();
 
                 //call all entity updates
                 HandleEntityUpdates();
 
+                Entities.entityManager.CleanUp();
+
+                FPSCounter.DisplayedString = FPS.ToString();
+                EntityCount.DisplayedString = Entities.entityManager.Entitys.Count.ToString();
+                EntitiesToDestroyCount.DisplayedString = Entities.entityManager.EntitysToBeDestroyed.Count.ToString();
+
+                window.Draw(FPSCounter);
+                window.Draw(EntityCount);
+                window.Draw(EntitiesToDestroyCount);
+                window.Draw(MemoryCounter);
+
                 window.Display();
+
+                frameCount++;
+                if (fpsClock.ElapsedTime.AsSeconds() >= 1.0f)
+                {
+                    FPS = frameCount;
+                    frameCount = 0;
+                    fpsClock.Restart();
+                }
+
+                memoryUsageBytes = currentProcess.PrivateMemorySize64;
+                memoryUsageMB = memoryUsageBytes / (1024.0 * 1024.0);
+
+               
+
+                MemoryCounter.DisplayedString = Math.Round(memoryUsageMB, 2).ToString();
+
+
             }
         }
         void HandleClose(object sender, EventArgs e)
@@ -359,7 +520,7 @@ namespace Wolstencroft
 
 
         }
-      
+
 
         void HandleKeyPress(object sender, SFML.Window.KeyEventArgs e)
         {
@@ -372,9 +533,10 @@ namespace Wolstencroft
 
         static public void Log<T>(T Data)
         {
-            Console.WriteLine($"[{RunTimeClock.ElapsedTime.AsSeconds()}][{Data}]");
+            if (bShouldLog)
+                Console.WriteLine($"[{RunTimeClock.ElapsedTime.AsSeconds()}][{Data}]");
         }
-        
+
         static public Time GetTime()
         {
             return RunTimeClock.ElapsedTime;
@@ -396,7 +558,15 @@ namespace Wolstencroft
             Instance.Entities.entityManager.HandleEntityUpdates();
         }
 
+        public virtual void OnUpdate()
+        {
+
+        }
+
+        public virtual void OnStart()
+        {
+
+        }
     };
     #endregion
 }
-
