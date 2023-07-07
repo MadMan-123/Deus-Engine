@@ -13,7 +13,7 @@ class Program
     {
         float fAxisY = 0, fAxisX = 0;
 
-        float fSpeed = .05f;
+        float fSpeed = 50f;
         float fScale = 0.025f;
         public override void OnUpdate()
         {
@@ -51,7 +51,7 @@ class Program
 
             //move the player towards the mouse
 
-            Vector2f _vResult = new Vector2f(fAxisX, fAxisY) * fSpeed;
+            Vector2f _vResult = new Vector2f(fAxisX, fAxisY) * fSpeed * Game.DeltaTime.AsSeconds();
 
 
             entity.transform.position += (_vResult);
@@ -61,11 +61,14 @@ class Program
     class Projectile : Component
     {
         public Vector2f DirectionToFire;
-        public float fSpeed = 100f;
+        public float fSpeed = 500f;
         public float fTimeToWait = 2f;
+        public int iDamage = 10;
 
         public override void OnStart()
         {
+            entity.sTags.Add("Projectile");
+
             DestroyObject();
         }
 
@@ -118,6 +121,36 @@ class Program
 
         }
     }
+
+    class Health : Component
+    {
+        public int iMaxHealth = 100;
+        public int iCurrentHealth { get; private set; }
+
+
+        public override void OnStart()
+        {
+            iCurrentHealth = iMaxHealth;
+        }
+
+        public void TakeDamage(int Damage)
+        {
+
+            iCurrentHealth -= Damage;
+
+            if(iCurrentHealth < 1)
+            {
+                HandleDeath();
+            }
+        }
+
+        void HandleDeath()
+        {
+            Game.Destroy(entity);
+        }
+
+    }   
+    
     #endregion
     #region CustomEntities
     #region Test
@@ -135,8 +168,16 @@ class Program
             renderable = AddComponent<Renderable>();
             collider = AddComponent<Collider2D>();
 
+            collider.OnCollisionEvent += OnHit;
 
             transform.size = new Vector2f(5, 5);
+        }
+
+        void OnHit(Collider2D other)
+        {
+            if(other.entity.CompareTag("Enemy"))
+                Game.Destroy(this);
+
         }
     }
 
@@ -156,6 +197,7 @@ class Program
             projectileHandler = AddComponent<ProjectileHandler>();
             collider = AddComponent<Collider2D>();
 
+            collider.bShouldDrawBounds = true;
 
             transform.position += transform.size / 2;
 
@@ -164,28 +206,46 @@ class Program
 
     class TestCollider : Entity
     {
-        Collider2D collider;
+        Collider2D colliderComp;
         Renderable renderable;
+        Health health;
 
         public TestCollider()
         {
             transform.size = new Vector2f(10, 10);
 
-            collider = AddComponent<Collider2D>();
+            colliderComp = AddComponent<Collider2D>();
             renderable = AddComponent<Renderable>();
+            health = AddComponent<Health>();
 
-            collider.OnCollisionEvent += Collision;
-            collider.OnExitCollisionEvent += Exit;
+            health.iMaxHealth = 100;
+
+            colliderComp.OnCollisionEvent += Collision;
+            colliderComp.OnExitCollisionEvent += Exit;
+
+            colliderComp.bShouldDrawBounds = true;
 
             transform.position = new Vector2f(100, 100);
         }
 
-        void Collision(Collider2D collider)
+        void Collision(Collider2D other)
         {
             renderable.Body.FillColor = Color.Red;
+
+            if (other.entity.CompareTag("Projectile"))
+            {
+                Projectile proj = other.entity.GetComponent<Projectile>();
+                if (proj != null)
+                {
+                    health.TakeDamage(proj.iDamage);
+                    transform.position -= proj.DirectionToFire * 5;
+
+                    
+                }
+            }
         }
 
-        void Exit(Collider2D collider)
+        void Exit(Collider2D other)
         {
             renderable.Body.FillColor = Color.White;
 
@@ -194,7 +254,40 @@ class Program
 
     };
 
+    class WaveOBJ : Entity
+    {
+        List<TestCollider> Nodes = new List<TestCollider>();
+        int iAmmountOfNodes = 10;
+        private int fScale = 50;
 
+        public override void OnStart()
+        {
+            //create a pool of x ammount of nodes
+            for (int i = 0; i < iAmmountOfNodes; i++)
+            {
+                Nodes.Add((TestCollider)Game.Instantiate(new TestCollider()));
+
+                Nodes[i].transform.position = new Vector2f(i * fScale, (MathF.Sin(i) * fScale) + 100);
+            }
+
+        }
+
+        public override void OnUpdate()
+        {
+            //create a pool of x ammount of nodes
+            for (int i = 0; i < iAmmountOfNodes; i++)
+            {
+                ref Vector2f pos = ref Nodes[i].transform.position;
+                pos = new Vector2f((pos.X + 1), (MathF.Sin(Game.GetTime().AsSeconds() + i) * fScale) + 100);
+                if (pos.X > 500)
+                {
+                    pos.X = 0;
+                }
+            }
+
+        }
+
+    }
     #endregion
     #endregion
 
@@ -205,15 +298,15 @@ class Program
     {
         Game game = new Game();
         Player player = new Player();
-        TestCollider testCollider = new TestCollider();
-        TestCollider testCollider1 = new TestCollider();
+        player.sTags.Add("Player");
 
-        testCollider1.transform.position = new Vector2f(200, 200);
+        TestCollider collider = new TestCollider();
+        collider.sTags.Add("Enemy");
 
+        collider.transform.position = new Vector2f(100, 100);
 
         Game.Instantiate(player);
-        Game.Instantiate(testCollider);
-        Game.Instantiate(testCollider1);
+        Game.Instantiate(collider);
 
 
         game.Start();
