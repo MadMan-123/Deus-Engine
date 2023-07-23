@@ -1,8 +1,9 @@
-﻿using Wolstencroft;
+﻿using SFML.Audio;
 using SFML.Graphics;
 using SFML.System;
-using SFML.Audio;
 using SFML.Window;
+using Wolstencroft;
+
 class Program
 {
     #region CustomComponents
@@ -61,9 +62,9 @@ class Program
     class Projectile : Component
     {
         public Vector2f DirectionToFire;
-        public float fSpeed = 500f;
+        public float fSpeed = 100f;
         public float fTimeToWait = 2f;
-        public int iDamage = 10;
+        public int iDamage = 25;
 
         public override void OnStart()
         {
@@ -115,7 +116,10 @@ class Program
             ProjectileOBJ projectile = new ProjectileOBJ();
             projectile.transform.position = transform.position;
             projectile.projectile.DirectionToFire = DirectionToFire;
+
+
             Game.Instantiate(projectile);
+
             await Task.Delay((int)(fTimeToWait * 1000f));
             bCanFire = true;
 
@@ -127,7 +131,7 @@ class Program
         public int iMaxHealth = 100;
         public int iCurrentHealth { get; private set; }
 
-
+        public Action<Health>? OnDeath;
         public override void OnStart()
         {
             iCurrentHealth = iMaxHealth;
@@ -138,7 +142,7 @@ class Program
 
             iCurrentHealth -= Damage;
 
-            if(iCurrentHealth < 1)
+            if (iCurrentHealth < 1)
             {
                 HandleDeath();
             }
@@ -146,11 +150,12 @@ class Program
 
         void HandleDeath()
         {
+            OnDeath?.Invoke(this);
             Game.Destroy(entity);
         }
 
-    }   
-    
+    }
+
     #endregion
     #region CustomEntities
     #region Test
@@ -171,11 +176,12 @@ class Program
             collider.OnCollisionEvent += OnHit;
 
             transform.size = new Vector2f(5, 5);
+
         }
 
         void OnHit(Collider2D other)
         {
-            if(other.entity.CompareTag("Enemy"))
+            if (other.entity.CompareTag("Enemy"))
                 Game.Destroy(this);
 
         }
@@ -197,21 +203,28 @@ class Program
             projectileHandler = AddComponent<ProjectileHandler>();
             collider = AddComponent<Collider2D>();
 
-            collider.bShouldDrawBounds = true;
+            collider.bShouldDrawBounds = false;
 
-            transform.position += transform.size / 2;
+            renderable.SetTexture("..\\..\\..\\Marat - copy.jpg");
+
 
         }
     }
 
-    class TestCollider : Entity
+    class Enemy : Entity
     {
         Collider2D colliderComp;
         Renderable renderable;
         Health health;
 
-        public TestCollider()
+        string soundFilePath = "..\\..\\..\\Scream.wav";
+        SoundBuffer soundBuffer;
+        Sound sound;
+
+        public Enemy()
         {
+            soundBuffer = new SoundBuffer(soundFilePath);
+            sound = new Sound(soundBuffer);
             transform.size = new Vector2f(10, 10);
 
             colliderComp = AddComponent<Collider2D>();
@@ -226,11 +239,12 @@ class Program
             colliderComp.bShouldDrawBounds = true;
 
             transform.position = new Vector2f(100, 100);
+
+            health.OnDeath += Death;
         }
 
         void Collision(Collider2D other)
         {
-            renderable.Body.FillColor = Color.Red;
 
             if (other.entity.CompareTag("Projectile"))
             {
@@ -240,75 +254,134 @@ class Program
                     health.TakeDamage(proj.iDamage);
                     transform.position -= proj.DirectionToFire * 5;
 
-                    
+
                 }
             }
         }
 
         void Exit(Collider2D other)
         {
-            renderable.Body.FillColor = Color.White;
+
+        }
+
+        void Death(Health NewHealth)
+        {
+            sound.Play();
+        }
+
+    };
+
+
+    public class SpawenerOBJ : Entity
+    {
+        ProjectileOBJ projectile = new ProjectileOBJ();
+
+        float fRot = 0f;
+
+        public SpawenerOBJ()
+        {
+
+        }
+
+        public override void OnStart()
+        {
+            Spawn(1);
+
+        }
+
+        async void Spawn(int iTime)
+        {
+
+            await Task.Delay((iTime));
+            Game.Instantiate(projectile);
+            Spawn(iTime);
+
+        }
+    }
+
+
+    public class MaratOBJ : Entity
+    {
+        Renderable renderable;
+
+        public MaratOBJ()
+        {
+            renderable = AddComponent<Renderable>();
+            renderable.SetTexture("..\\..\\..\\Marat - copy.jpg");
+
+            transform.position = new Vector2f(200, 200);
+            transform.size = new Vector2f(200, 200);
+        }
+
+    };
+
+    #endregion
+    #endregion
+
+    public class MazeGenGame : Game
+    {
+
+        public class Cell : Entity
+        {
+            Renderable renderable;
+
+            TextComponent text;
+
+            Shader shader;
+            float fScale = 20;
+
+
+
+            public override void OnStart()
+            {
+                text = AddComponent<TextComponent>();
+                renderable = AddComponent<Renderable>();
+
+                shader = new Shader(null, null, "..\\..\\..\\BackGround.frag");
+                shader.SetUniform("Resolution", new Vector2f(Game.Instance.iWidth,Game.Instance.iHeight));
+                shader.SetUniform("fScale", fScale);
+                renderable.SetShader(shader);
+            }
+
+
+            public override void OnUpdate()
+            {
+                shader.SetUniform("MousePos", Game.MousePos);
+                shader.SetUniform("uTime", Game.GetTime().AsSeconds());
+                if(Game.IsKeyPressed(Keyboard.Key.Up))
+                {
+                    fScale += 0.1f;
+                }
+                else if(Game.IsKeyPressed(Keyboard.Key.Down))
+                {
+                    fScale -= 0.1f;
+                }
+
+                if (fScale <= 0)
+                {
+                    fScale = 0;
+                }
+                shader.SetUniform("fScale", fScale);
+
+            }
 
         }
 
 
-    };
-
-    class WaveOBJ : Entity
-    {
-        List<TestCollider> Nodes = new List<TestCollider>();
-        int iAmmountOfNodes = 10;
-        private int fScale = 50;
-
         public override void OnStart()
         {
-            //create a pool of x ammount of nodes
-            for (int i = 0; i < iAmmountOfNodes; i++)
-            {
-                Nodes.Add((TestCollider)Game.Instantiate(new TestCollider()));
-
-                Nodes[i].transform.position = new Vector2f(i * fScale, (MathF.Sin(i) * fScale) + 100);
-            }
-
+            Cell cell = new Cell();
+            cell.transform.size = new Vector2f(1000, 1000);
+            Entities.AddEntity(cell);
         }
 
         public override void OnUpdate()
         {
-            //create a pool of x ammount of nodes
-            for (int i = 0; i < iAmmountOfNodes; i++)
-            {
-                ref Vector2f pos = ref Nodes[i].transform.position;
-                pos = new Vector2f((pos.X + 1), (MathF.Sin(Game.GetTime().AsSeconds() + i) * fScale) + 100);
-                if (pos.X > 500)
-                {
-                    pos.X = 0;
-                }
-            }
-
         }
-
     }
-    #endregion
-    #endregion
-
-
-
-
     static void Main()
     {
-        Game game = new Game();
-        Player player = new Player();
-        player.sTags.Add("Player");
-
-        TestCollider collider = new TestCollider();
-        collider.sTags.Add("Enemy");
-
-        collider.transform.position = new Vector2f(100, 100);
-
-        Game.Instantiate(player);
-        Game.Instantiate(collider);
-
-
+        MazeGenGame game = new MazeGenGame();
         game.Start();
 
 

@@ -1,10 +1,9 @@
+using SFML.Audio;
 using SFML.Graphics;
 using SFML.System;
-using SFML.Audio;
 using SFML.Window;
-using static System.Reflection.Metadata.BlobBuilder;
 using System.Diagnostics;
-using System.Globalization;
+
 
 namespace Wolstencroft
 {
@@ -21,8 +20,6 @@ namespace Wolstencroft
 
         }
 
-       
-
         //float lerp 
         static public float Lerp(float a, float b, float T)
         {
@@ -35,13 +32,16 @@ namespace Wolstencroft
             return (1 - T) * a + b * T;
         }
 
+        //convert a integer based vector to a float based vector
         static public Vector2i V2FtoV2I(Vector2f input) => new Vector2i((int)input.X, (int)input.Y);
 
+
+        //Pythagoras c^2=a^2+b^2
         static public float Distance(Vector2f a, Vector2f b)
         {
-            float A = ( b.X - a.X);
-            float B = ( b.Y - a.Y);
-            return MathF.Sqrt(MathF.Pow(A, 2) + MathF.Pow(B, 2));
+            float A = b.X - a.X;
+            float B = b.Y - a.Y;
+            return MathF.Sqrt(A * A + B * B);
         }
 
     }
@@ -61,11 +61,11 @@ namespace Wolstencroft
         public virtual void OnUpdate() { }
         public virtual void OnStart() { }
 
-        public Component()
-        {
+        public Component() =>
+            //set the game reference 
             game = Game.Instance;
-        }
 
+        //set the entity parent as reference 
         public void SetEntityParent(ref Entity entity)
         {
             this.entity = entity;
@@ -77,67 +77,132 @@ namespace Wolstencroft
     //to render on screen 
     class Renderable : Component
     {
+        //the body to render
         public RectangleShape Body = new RectangleShape();
+        public Texture texture;
+        public Color FillColour = Color.White, OutlineColour;
 
+        // Shader and fragment shader objects
+        private Shader shader;
 
-        public Renderable()
+        public override void OnStart()
         {
+            Body.FillColor = FillColour;
+            Body.OutlineColor = OutlineColour;
+
+            
         }
 
+        // Set the shader for the renderable
+        public void SetShader(Shader shader)
+        {
+            this.shader = shader;
+        }
+
+
+
+        public void SetFillColour(Color color)
+        {
+            Body.FillColor = color;
+        }
+
+        public void SetTexture(string sPathToTexture)
+        {
+            texture = new Texture(sPathToTexture);
+            Body.Texture = texture;
+
+        }
+        //overriden function
         public override void OnUpdate()
         {
+            //set the body to be the position of the parent entity 
             Body.Position = entity.transform.position;
+            //set the rotation to the rotation of the parent rotation
             Body.Rotation = entity.transform.fRotation;
+            //set the size to the size of the entity
             Body.Size = entity.transform.size;
-            Game.Instance.Draw(Body);
+
+
+            // Draw the body with the shader if it's set
+            if (shader != null)
+            {
+                Game.Instance.window.Draw(Body, new RenderStates(shader));
+            }
+            else
+            {
+                Game.Instance.Draw(Body);
+            }
+
         }
     }
 
     //handle the transform of an object
     class Transform2D : Component
     {
+        //position
         public Vector2f position = new Vector2f(0, 0);
+        //size
         public Vector2f size = new Vector2f(0, 0);
+        //rotation
         public float fRotation = 0f;
     }
 
     class Collider2D : Component
     {
+        //should draw the colliders bounds
         public bool bShouldDrawBounds = false;
+        //the actual collider
         public FloatRect Collider;
+        //bool to tell if coliding
         public bool bIsColiding = false;
 
+        //events to trigger when colliding
         public Action<Collider2D> OnCollisionEvent;
         public Action<Collider2D> OnExitCollisionEvent;
 
+        //a collider manager 
         private ColliderManager collisions = new ColliderManager();
+        //the collider outline 
         RectangleShape outline = new RectangleShape();
+
 
         public Collider2D()
         {
+
+            //setting the collider bounds visual
             outline.OutlineThickness = 1;
             outline.OutlineColor = Color.Green;
+            outline.FillColor = new SFML.Graphics.Color(0, 0, 0, 0);
         }
 
         public override void OnUpdate()
         {
+            //set all the corrisponding points to the same of the transform
             Collider.Left = transform.position.X;
             Collider.Top = transform.position.Y;
             Collider.Width = transform.size.X;
             Collider.Height = transform.size.Y;
-            
 
-            if(bShouldDrawBounds)
+            //if the collider should draw its bounds
+            if (bShouldDrawBounds)
             {
+                //set the position and scale to that of the transform
                 outline.Position = transform.position;
                 outline.Size = transform.size;
+
+                //draw the collider bounds
                 Game.Instance.window.Draw(outline);
             }
 
         }
 
+        //checks for collision with other collider
         public unsafe bool IsColiding(Collider2D other)
         {
+            //check if the other variable exists
+            if (other == null)
+                return false;
+
             //check if the collisions in the collider are still in
             bool bTemp = Collider.Intersects(other.Collider);
             if (bTemp && !collisions.colliders.Any(c => c == other))
@@ -160,239 +225,286 @@ namespace Wolstencroft
                 OnExitCollisionEvent?.Invoke(other);
             }
 
+            //return value
             return bTemp;
 
         }
 
     }
 
-    class ColliderManager : Component
+    class TextComponent : Component
     {
-        public List<Collider2D> colliders = new List<Collider2D>();
-        public int iColCheckPerFrame = 0;
-  
+        string sText = "";
+        Text text;
 
-        public void RemoveCollider(Collider2D col)
+        public override void OnStart()
         {
-            if (colliders.Contains(col))
-                colliders.Remove(col);
+            text = new Text();
+            text.DisplayedString = sText;
+
         }
 
-        public void AddCollider(Entity entity)
+        public override void OnUpdate()
         {
-            Collider2D col = entity.GetComponent<Collider2D>();
-            if (col != null)
-            {
-                colliders.Add(col);
+            text.Position = transform.position;
+            text.Rotation = transform.fRotation;
+            Game.Instance.Draw(text);
+        }
 
+        public void SetText(string Text)
+        {
+            sText = Text;
+        }
+
+    }
+
+    class ColliderManager
+    {
+        //hash map for the colliders
+        public HashSet<Collider2D> colliders = new HashSet<Collider2D>();
+
+        //handles removing a collider
+        public void RemoveCollider(Collider2D col)
+        {
+            //if the collider is in the hashset
+            if (colliders.Contains(col))
+            {
+                //remove
+                colliders.Remove(col);
+                //clean the hashset
+                colliders.TrimExcess();
             }
         }
 
+        //handles adding a collider through entity
+        public void AddCollider(Entity entity)
+        {
+            //cache the collider
+            Collider2D col = entity.GetComponent<Collider2D>();
+            if (col != null)
+            {
+                //add the collider to hashset
+                colliders.Add(col);
+            }
+        }
+
+        //handles adding a collider through collider
         public void AddCollider(Collider2D col)
         {
+            //if the collider exists, return
             if (colliders.Contains(col))
                 return;
 
+            //add to hashset
             colliders.Add(col);
         }
 
 
+
+        //handles checking the collision in all the colliders
         public void CheckAllForCollision()
         {
+            // Get the count of colliders
             int colliderCount = colliders.Count;
 
-            for (int i = 0; i < colliderCount; i++)
+            // Create a copy of the colliders using a HashSet
+            HashSet<Collider2D> collidersCopy = new HashSet<Collider2D>(colliders);
+
+            // Iterate over each collider in the collidersCopy HashSet
+            foreach (Collider2D col in collidersCopy)
             {
-                Collider2D col = colliders[i];
-                for (int j = 0 ; j < colliderCount; j++)
+                // Iterate over each collider again for collision checking
+                foreach (Collider2D colx in collidersCopy)
                 {
-                    if (i == j)
+                    // Skip if it's the same collider
+                    if (col == colx)
                         continue;
 
-                    Collider2D colx = colliders[j];
+                    // Perform null checks
+                    if (col == null || colx == null)
+                        break;
 
+                    // Check collision between the colliders
                     bool bProduct = col.IsColiding(colx);
                     col.bIsColiding = bProduct;
-                    
                 }
             }
-
-    
-            
-
         }
 
-        public unsafe bool* CheckAndReturnAllForCollision()
+
+
+
+        //clean up the hashset
+        public void CleanUp()
         {
-            int colliderCount = colliders.Count;
-
-            //if there are no colliders return
-            if (colliderCount == 0)
-                return null;
-
-            bool* bIsCollidingArray = stackalloc bool[colliderCount];
-
-
-            for (int i = 0; i < colliderCount; i++)
-            {
-                Collider2D col = colliders[i];
-
-                for (int j = i + 1; j < colliderCount; j++)
-                {
-                    Collider2D colx = colliders[j];
-
-                    if (WMaths.Distance(colx.transform.position, col.transform.position) > 2)
-                        continue;
-                    bool bProduct = col.IsColiding(colx);
-                    bIsCollidingArray[i] = (bProduct);
-                }
-            }
-
-
-
-            return bIsCollidingArray;
+            colliders.RemoveWhere(col => col == null);
         }
-
     }
-    class EntityManager : Component
+
+    //handles multiple entitys
+    class EntityManager
     {
-        public List<Entity> Entitys = new List<Entity>();
-        public List<Entity> EntitysToBeDestroyed = new List<Entity>();
-        public float fSeccondsToCleanUp = 2.5f;
-        bool bCanClean = true;
-        ColliderManager colliderManager = new ColliderManager();
+        // List of active entities
+        public List<Entity> Entities = new List<Entity>();
 
+        // List of entities to be destroyed
+        public List<Entity> EntitiesToBeDestroyed = new List<Entity>();
 
-        public override void OnStart()
-        {
-        }
+        // Time in seconds to clean up destroyed entities
+        public float SecondsToCleanUp = 2.5f;
 
+        // Flag indicating if the cleanup is allowed
+        private bool CanClean = true;
 
+        // Collider manager to handle collisions
+        private ColliderManager colliderManager = new ColliderManager();
 
+        // Cleans up the destroyed entities
         public async void CleanUp()
         {
-            if (!bCanClean || EntitysToBeDestroyed.Count == 0)
+            if (!CanClean || EntitiesToBeDestroyed.Count == 0)
                 return;
 
-
-            //set the bool false 
-            bCanClean = false;
+            // Set the flag to false
+            CanClean = false;
 
             Game.Log("Start Clean Memory");
 
-
-            //for each entity remove it from the list
-            for (int i = 0; i < EntitysToBeDestroyed.Count; i++)
-            {
-                EntitysToBeDestroyed.RemoveAt(i);
-            }
-
-
-            //collect the memory
+            // Collect the memory
             GC.Collect();
             GC.SuppressFinalize(this);
 
-            //remove any null elements
-            EntitysToBeDestroyed.TrimExcess();
+            // Remove any null elements
+            EntitiesToBeDestroyed.RemoveAll(entity => entity == null);
 
-            await Task.Delay((int)(fSeccondsToCleanUp * 1000f));
+            await Task.Delay((int)(SecondsToCleanUp * 1000f));
 
-            bCanClean = true;
+            // Remove destroyed entities from the main list
+            Entities.RemoveAll(entity => EntitiesToBeDestroyed.Contains(entity));
 
+            // Clear the destroyed entities list
+            EntitiesToBeDestroyed.Clear();
 
+            // Clean up the collider manager
+            colliderManager.CleanUp();
+
+            CanClean = true;
         }
 
+        // Handles updating all entities
         public void HandleEntityUpdates()
         {
             HandlePhysicsUpdates();
 
-            for (int i = 0; i < Entitys.Count; i++)
+            for (int i = 0; i < Entities.Count; i++)
             {
-                if (Entitys[i] != null)
-                    Entitys[i].RunUpdates();
+                if (Entities[i] != null)
+                    Entities[i].RunUpdates();
             }
-
         }
 
+        // Handles updating physics and collisions
         public void HandlePhysicsUpdates()
         {
             colliderManager.CheckAllForCollision();
-
-           
-            
         }
 
+        // Adds an entity to the manager
         public Entity AddEntity(Entity entity)
         {
-            Game.Log($"Added: {(entity.Name)}");
+            Game.Log($"Added: {entity.Name}");
             entity.RunStarts();
 
-            //attempt to add a collider to the manager
+            // Attempt to add a collider to the manager
             colliderManager.AddCollider(entity);
 
-            Entitys.Add(entity);
+            Entities.Add(entity);
 
             return entity;
         }
 
+        // Destroys an entity
         public void Destroy(Entity entity)
         {
             Game.Log($"Added: {entity.Name} To Be Destroyed");
-            //remove entity from list
-            Entitys.Remove(entity);
-            //clean up list
-            Entitys.TrimExcess();
 
-            //add entity to list of entitys to be destroyed but disable it from view
-            EntitysToBeDestroyed.Add(entity);
+            // Remove the entity from the list
+            Entities.Remove(entity);
+
+            // Clean up the list
+            Entities.TrimExcess();
+
+            // Remove the collider from the collider manager
+            Collider2D cache = entity.GetComponent<Collider2D>();
+
+            if (cache != null)
+            {
+                colliderManager.RemoveCollider(cache);
+            }
+
+            // Clean up the components list
+            entity.components.TrimExcess();
+
+            // Add the entity to the list of entities to be destroyed
+            EntitiesToBeDestroyed.Add(entity);
         }
-
-
     }
+
     #endregion
     #region Entity
     class Entity
     {
+        // List of components attached to the entity
         public List<Component> components = new List<Component>();
-        public Transform2D transform;
-        public string Name = "Entity";
-        private Entity entityRef;
-        public List<string> sTags = new List<string>();
-       // public List<String> sIgnoreTags = new List<String>();
 
+        // Transform component for position, size, and rotation
+        public Transform2D transform;
+
+        // Name of the entity
+        public string Name = "Entity";
+
+        // Reference to the entity itself
+        private Entity entityRef;
+
+        // List of tags associated with the entity
+        public List<string> sTags = new List<string>();
+
+        // Executes when the entity starts
         public virtual void OnStart() { }
+
+        // Executes when the entity updates
         public virtual void OnUpdate() { }
 
-
+        // Constructor
         public Entity()
         {
             entityRef = this;
-            //add transform2d by default
+            // Add the Transform2D component by default
             transform = AddComponent<Transform2D>();
-            if (this != null)
-                Name = ToString();
+            Name = ToString();
         }
 
-        //run all component starts
+        // Runs the OnStart method of the entity and all attached components
         public void RunStarts()
         {
             OnStart();
-            for (int i = 0; i < components.Count; i++)
+            foreach (Component component in components)
             {
-                components[i].OnStart();
-            }
-        }
-        public void RunUpdates()
-        {
-            OnUpdate();
-            //runs all component updates 
-            foreach (var Comp in components)
-            {
-                Comp.OnUpdate();
+                component.OnStart();
             }
         }
 
-        //add a component to the list
+        // Runs the OnUpdate method of the entity and all attached components
+        public void RunUpdates()
+        {
+            OnUpdate();
+            foreach (Component component in components)
+            {
+                component.OnUpdate();
+            }
+        }
+
+        // Adds a component of type T to the entity
         public T AddComponent<T>() where T : Component, new()
         {
             T NewComp = new T();
@@ -402,42 +514,41 @@ namespace Wolstencroft
             return NewComp;
         }
 
-        //get a component from the list
+        // Gets a component of type T from the entity
         public T GetComponent<T>() where T : Component, new()
         {
-            T NewComp = new T();
-
             for (int i = 0; i < components.Count; i++)
             {
-                if (NewComp.GetType() == components[i].GetType())
+                if (components[i].GetType() == typeof(T))
                 {
                     return (T)(components[i]);
                 }
             }
 
             return null;
-
-
         }
 
-       public bool CompareTag(string sTag) => sTags.Any(s => s == sTag);
+        // Checks if the entity has a specific tag
+        public bool CompareTag(string sTag) => sTags.Any(s => s == sTag);
 
-       public bool CompareTags(List<string> strings) => sTags.Any(x => strings.Any(y => EqualityComparer<string>.Default.Equals(x, y)));
-
-    };
-
-    class EntityManagerOBJ : Entity
-    {
-        public EntityManager entityManager;
-
-
-
-        public EntityManagerOBJ()
-        {
-            entityManager = AddComponent<EntityManager>();
-        }
+        // Checks if the entity has any of the specified tags
+        public bool CompareTags(List<string> strings) => sTags.Any(x => strings.Any(y => EqualityComparer<string>.Default.Equals(x, y)));
     }
 
+
+    class SoundManager
+    {
+        public static SoundManager Instance { get; private set; }
+        SoundBuffer soundBuffer;
+
+        public SoundManager()
+        {
+
+            if (Instance == null)
+                Instance = this;
+
+        }
+    }
 
     #endregion
     #region Game
@@ -445,49 +556,64 @@ namespace Wolstencroft
     //main game logic
     class Game
     {
-        public static Game Instance = null;
+        // Singleton instance of the game
+        public static Game Instance;
 
+        // Render window for the game
         public RenderWindow window;
 
+        // Width and height of the window
         public uint iWidth = 400, iHeight = 400;
 
+        // Name of the window
         public string sName = "Window";
 
+        // Clock to measure the runtime
         static Clock RunTimeClock = new Clock();
 
-        public EntityManagerOBJ Entities;
+        // Entity manager to handle entities
+        public EntityManager Entities;
 
+        // Delta time between frames
         static public Time DeltaTime;
 
+        // Frames per second
         static public int FPS;
         private Clock fpsClock;
 
         private int frameCount = 0;
         private Clock frameTimer = new Clock();
 
-        static public Font EngineFont = new Font("F:\\Dev\\WolstencroftEngine\\consolas\\consola.ttf");
+        // Font for text display
+        static public Font EngineFont = new Font("..\\..\\..\\fonts/consola.ttf");
+
+        static public Vector2f MousePos;
 
         protected static bool bShouldLog = true;
         Process currentProcess;
         long memoryUsageBytes = 0;
         double memoryUsageMB = 0;
 
+        // Background music
+        public Music BackGroundMusic;
 
+        // Constructor
         public Game()
         {
             if (Instance == null)
                 Instance = this;
             window = new RenderWindow(new VideoMode(iWidth, iHeight), sName);
-            Entities = new EntityManagerOBJ();
+            Entities = new EntityManager();
         }
 
+        // Draw a drawable object on the window
         public void Draw(SFML.Graphics.Drawable drawable)
         {
             if (window != null && drawable != null)
                 window.Draw(drawable);
         }
 
-
+        // Start the game
         public void Start()
         {
             RunTimeClock.Restart();
@@ -499,12 +625,15 @@ namespace Wolstencroft
             HandleUpdate();
         }
 
+        // Size of the text displayed
         static uint iSize = 15;
 
         Text FPSCounter = new Text("", EngineFont, iSize);
         Text EntityCount = new Text("", EngineFont, iSize);
         Text EntitiesToDestroyCount = new Text("", EngineFont, iSize);
-        Text MemoryCounter = new Text("", EngineFont, iSize);
+        //Text MemoryCounter = new Text("", EngineFont, iSize);
+
+        // Update loop for the game
         void HandleUpdate()
         {
             Clock clock = new Clock();
@@ -512,31 +641,37 @@ namespace Wolstencroft
 
             EntityCount.Position = new Vector2f(0, 20);
             EntitiesToDestroyCount.Position = new Vector2f(0, 40);
-            MemoryCounter.Position = new Vector2f(0, 60);
+            //MemoryCounter.Position = new Vector2f(0, 60);
+
+            if (BackGroundMusic != null)
+            {
+                BackGroundMusic.Play();
+            }
+
             while (window.IsOpen)
             {
+                MousePos = (Vector2f)Mouse.GetPosition(Game.Instance.window);
                 currentProcess = Process.GetCurrentProcess();
                 DeltaTime = clock.Restart();
                 window.DispatchEvents();
                 window.Clear();
 
-                //call game update
+                // Call game update
                 OnUpdate();
 
-                //call all entity updates
+                // Call all entity updates
                 HandleEntityUpdates();
 
-       
-                Entities.entityManager.CleanUp();
+                Entities.CleanUp();
 
                 FPSCounter.DisplayedString = FPS.ToString();
-                EntityCount.DisplayedString = Entities.entityManager.Entitys.Count.ToString();
-                EntitiesToDestroyCount.DisplayedString = Entities.entityManager.EntitysToBeDestroyed.Count.ToString();
+                EntityCount.DisplayedString = Entities.Entities.Count.ToString();
+                EntitiesToDestroyCount.DisplayedString = Entities.EntitiesToBeDestroyed.Count.ToString();
 
                 window.Draw(FPSCounter);
                 window.Draw(EntityCount);
                 window.Draw(EntitiesToDestroyCount);
-                window.Draw(MemoryCounter);
+                //window.Draw(MemoryCounter);
 
                 window.Display();
 
@@ -548,71 +683,75 @@ namespace Wolstencroft
                     fpsClock.Restart();
                 }
 
-                memoryUsageBytes = currentProcess.PrivateMemorySize64;
-                memoryUsageMB = memoryUsageBytes / (1024.0 * 1024.0);
+                /*memoryUsageBytes = currentProcess.WorkingSet64;
+                memoryUsageMB = memoryUsageBytes / (1024.0 * 1024.0);*/
 
-               
-
-                MemoryCounter.DisplayedString = Math.Round(memoryUsageMB, 2).ToString(CultureInfo.CurrentCulture);
-
-
+                //MemoryCounter.DisplayedString = Math.Round(memoryUsageMB, 2).ToString(CultureInfo.CurrentCulture);
             }
         }
+
+        // Event handler for window close
         void HandleClose(object sender, EventArgs e)
         {
+            Entities.CleanUp();
             window.Close();
             window.Closed -= HandleClose;
             window.KeyPressed -= HandleKeyPress;
-
-
-
         }
 
-
+        // Event handler for key press
         void HandleKeyPress(object sender, SFML.Window.KeyEventArgs e)
         {
         }
 
+        // Check if a specific key is pressed
         static public bool IsKeyPressed(SFML.Window.Keyboard.Key key)
         {
             return SFML.Window.Keyboard.IsKeyPressed(key);
         }
 
+        // Log a message
         static public void Log<T>(T Data)
         {
             if (bShouldLog)
                 Console.WriteLine($"[{RunTimeClock.ElapsedTime.AsSeconds()}][{Data}]");
         }
 
+        // Get the current time
         static public Time GetTime()
         {
             return RunTimeClock.ElapsedTime;
         }
 
+        // Instantiate an entity and add it to the entity manager
         public static Entity Instantiate(Entity entity)
         {
-            Instance.Entities.entityManager.AddEntity(entity);
-
+            Instance.Entities.AddEntity(entity);
             return entity;
         }
+
+        // Destroy an entity
         public static void Destroy(Entity entity)
         {
-            Instance.Entities.entityManager.Destroy(entity);
+            Instance.Entities.Destroy(entity);
         }
+
+        // Handle entity updates
         static void HandleEntityUpdates()
         {
-            Instance.Entities.entityManager.HandleEntityUpdates();
+            Instance.Entities.HandleEntityUpdates();
         }
 
+        // Game update method to be overridden in derived classes
         public virtual void OnUpdate()
         {
-
         }
 
+        // Game start method to be overridden in derived classes
         public virtual void OnStart()
         {
-
         }
-    };
+    }
+
     #endregion
 }
