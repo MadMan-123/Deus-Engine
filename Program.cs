@@ -2,13 +2,11 @@
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
-using Wolstencroft;
+using DeusEngine;
 
 class Program
 {
     #region CustomComponents
-    #region Controller
-    #endregion
 
     class PlayerController : Component
     {
@@ -44,6 +42,17 @@ class Program
                 fAxisX = 0;
             }
 
+            //handle rotation
+            if(Game.IsKeyPressed (Keyboard.Key.Right))
+            {
+                transform.fRotation += 90f * Game.DeltaTime.AsSeconds();
+            }
+            else if(Game.IsKeyPressed(Keyboard.Key.Left))
+            {
+                transform.fRotation -= 90f * Game.DeltaTime.AsSeconds();
+
+            }
+
 
 
             fAxisY = Math.Clamp(fAxisY, -1, 1);
@@ -56,73 +65,6 @@ class Program
 
 
             entity.transform.position += (_vResult);
-        }
-    }
-
-    class Projectile : Component
-    {
-        public Vector2f DirectionToFire;
-        public float fSpeed = 100f;
-        public float fTimeToWait = 2f;
-        public int iDamage = 25;
-
-        public override void OnStart()
-        {
-            entity.sTags.Add("Projectile");
-
-            DestroyObject();
-        }
-
-        public override void OnUpdate()
-        {
-
-            transform.position -= DirectionToFire * fSpeed * Game.DeltaTime.AsSeconds();
-        }
-
-        async void DestroyObject()
-        {
-            await Task.Delay((int)(fTimeToWait * 1000f));
-            Game.Destroy(entity);
-
-        }
-
-    }
-
-    class ProjectileHandler : Component
-    {
-        public Vector2f DirectionToFire;
-
-        bool bCanFire = true;
-        public float fTimeToWait = 0.25f;
-
-
-        public override void OnStart()
-        {
-        }
-        public override void OnUpdate()
-        {
-            DirectionToFire = entity.transform.position - (Vector2f)Mouse.GetPosition(Game.Instance.window);
-            DirectionToFire = WMaths.Normalize(DirectionToFire);
-
-            if (Mouse.IsButtonPressed(Mouse.Button.Left) && bCanFire)
-            {
-                Shoot();
-            }
-        }
-
-        async void Shoot()
-        {
-            bCanFire = false;
-            ProjectileOBJ projectile = new ProjectileOBJ();
-            projectile.transform.position = transform.position;
-            projectile.projectile.DirectionToFire = DirectionToFire;
-
-
-            Game.Instantiate(projectile);
-
-            await Task.Delay((int)(fTimeToWait * 1000f));
-            bCanFire = true;
-
         }
     }
 
@@ -157,233 +99,104 @@ class Program
     }
 
     #endregion
-    #region CustomEntities
-    #region Test
 
-    class ProjectileOBJ : Entity
+    const float fScale = 20f;
+    public class Player : Entity
     {
-        public Projectile projectile;
-        public Renderable renderable;
-        Collider2D collider;
-
-        public ProjectileOBJ()
-        {
-            //reference the projectile
-            projectile = AddComponent<Projectile>();
-            renderable = AddComponent<Renderable>();
-            collider = AddComponent<Collider2D>();
-
-            collider.OnCollisionEvent += OnHit;
-
-            transform.size = new Vector2f(5, 5);
-
-        }
-
-        void OnHit(Collider2D other)
-        {
-            if (other.entity.CompareTag("Enemy"))
-                Game.Destroy(this);
-
-        }
-    }
-
-    class Player : Entity
-    {
-        PlayerController playerController;
-        Renderable renderable;
-        ProjectileHandler projectileHandler;
-        Collider2D collider;
+        PlayerController _controller;
+        Renderable _renderable;
 
         public Player()
         {
-            transform.size = new Vector2f(10, 10);
-
-            playerController = AddComponent<PlayerController>();
-            renderable = AddComponent<Renderable>();
-            projectileHandler = AddComponent<ProjectileHandler>();
-            collider = AddComponent<Collider2D>();
-
-            collider.bShouldDrawBounds = false;
-
-            renderable.SetTexture("..\\..\\..\\Marat - copy.jpg");
-
-
-        }
-    }
-
-    class Enemy : Entity
-    {
-        Collider2D colliderComp;
-        Renderable renderable;
-        Health health;
-
-        string soundFilePath = "..\\..\\..\\Scream.wav";
-        SoundBuffer soundBuffer;
-        Sound sound;
-
-        public Enemy()
-        {
-            soundBuffer = new SoundBuffer(soundFilePath);
-            sound = new Sound(soundBuffer);
-            transform.size = new Vector2f(10, 10);
-
-            colliderComp = AddComponent<Collider2D>();
-            renderable = AddComponent<Renderable>();
-            health = AddComponent<Health>();
-
-            health.iMaxHealth = 100;
-
-            colliderComp.OnCollisionEvent += Collision;
-            colliderComp.OnExitCollisionEvent += Exit;
-
-            colliderComp.bShouldDrawBounds = true;
-
-            transform.position = new Vector2f(100, 100);
-
-            health.OnDeath += Death;
-        }
-
-        void Collision(Collider2D other)
-        {
-
-            if (other.entity.CompareTag("Projectile"))
-            {
-                Projectile proj = other.entity.GetComponent<Projectile>();
-                if (proj != null)
-                {
-                    health.TakeDamage(proj.iDamage);
-                    transform.position -= proj.DirectionToFire * 5;
-
-
-                }
-            }
-        }
-
-        void Exit(Collider2D other)
-        {
-
-        }
-
-        void Death(Health NewHealth)
-        {
-            sound.Play();
-        }
-
-    };
-
-
-    public class SpawenerOBJ : Entity
-    {
-        ProjectileOBJ projectile = new ProjectileOBJ();
-
-        float fRot = 0f;
-
-        public SpawenerOBJ()
-        {
-
-        }
-
-        public override void OnStart()
-        {
-            Spawn(1);
-
-        }
-
-        async void Spawn(int iTime)
-        {
-
-            await Task.Delay((iTime));
-            Game.Instantiate(projectile);
-            Spawn(iTime);
-
-        }
-    }
-
-
-    public class MaratOBJ : Entity
-    {
-        Renderable renderable;
-
-        public MaratOBJ()
-        {
-            renderable = AddComponent<Renderable>();
-            renderable.SetTexture("..\\..\\..\\Marat - copy.jpg");
-
-            transform.position = new Vector2f(200, 200);
-            transform.size = new Vector2f(200, 200);
-        }
-
-    };
-
-    #endregion
-    #endregion
-
-    public class MazeGenGame : Game
-    {
-
-        public class Cell : Entity
-        {
-            Renderable renderable;
-
-            TextComponent text;
-
-            Shader shader;
-            float fScale = 20;
-
-
-
-            public override void OnStart()
-            {
-                text = AddComponent<TextComponent>();
-                renderable = AddComponent<Renderable>();
-
-                shader = new Shader(null, null, "..\\..\\..\\BackGround.frag");
-                shader.SetUniform("Resolution", new Vector2f(Game.Instance.iWidth,Game.Instance.iHeight));
-                shader.SetUniform("fScale", fScale);
-                renderable.SetShader(shader);
-            }
-
-
-            public override void OnUpdate()
-            {
-                shader.SetUniform("MousePos", Game.MousePos);
-                shader.SetUniform("uTime", Game.GetTime().AsSeconds());
-                if(Game.IsKeyPressed(Keyboard.Key.Up))
-                {
-                    fScale += 0.1f;
-                }
-                else if(Game.IsKeyPressed(Keyboard.Key.Down))
-                {
-                    fScale -= 0.1f;
-                }
-
-                if (fScale <= 0)
-                {
-                    fScale = 0;
-                }
-                shader.SetUniform("fScale", fScale);
-
-            }
-
-        }
-
-
-        public override void OnStart()
-        {
-            Cell cell = new Cell();
-            cell.transform.size = new Vector2f(1000, 1000);
-            Entities.AddEntity(cell);
+            _controller = AddComponent<PlayerController>();
+            _renderable = AddComponent<Renderable>();
+            _renderable.FillColour = Color.Green;
+            transform.size = new Vector2f(5, 5);
+            
+            ray.fDistance = 20f;
         }
 
         public override void OnUpdate()
         {
+            float fCurrentRot = transform.fRotation;
+            float fRadian = (((fCurrentRot + 90) * DMath.PI) / 180);
+
         }
     }
+    public class Cell : Entity
+    {
+        Renderable _renderable;
+        public Cell()
+        {
+            _renderable = AddComponent<Renderable>();
+            transform.size = new Vector2f(fScale , fScale );
+        }
+    }
+    public class Test : Game
+    {
+        Player _player; 
+        const int _iWidth = 6, _iHeight = 6;
+        Cell[] _cells;
+        int[] _iMap =
+        {
+            1,1,1,1,1,1,
+            1,0,1,0,0,1,
+            1,0,1,0,1,1,
+            1,0,0,0,0,1,
+            1,0,1,0,0,1,
+            1,1,1,1,1,1
+        };
+
+
+        public override void OnStart()
+        {
+            _cells = new Cell[_iWidth * _iHeight];
+            _player = new Player();
+            //initialize the map
+
+            for (int y = 0; y < _iHeight; y++) 
+            {
+                for(int x = 0; x < _iWidth; x++)
+                {
+                    //calculate the index for a 2d map on a 1d array
+                    int iIndex = y * _iWidth + x;
+                    //cache the current cells
+                    Cell cache = _cells[iIndex] = new Cell();
+
+
+                    //cache the renderable
+                    Renderable RenderCache = cache.GetComponent<Renderable>();
+                    //set the position 
+                    cache.transform.position = new Vector2f(x * fScale, y * fScale);
+                    //set the color
+                    if (_iMap[iIndex] == 0)
+                    {
+                        RenderCache.FillColour = (Color.Black);
+                    }
+                    else if (_iMap[iIndex] == 1)
+                    {
+                        RenderCache.FillColour = (Color.White);
+                    }
+
+                    //add it to the game
+                    Game.Instantiate(cache);
+
+                }
+            }
+
+            Instantiate(_player);
+           
+        }
+
+
+    }
+
+
+  
     static void Main()
     {
-        MazeGenGame game = new MazeGenGame();
+        Test game = new Test();
         game.Start();
-
 
     }
 

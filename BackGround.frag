@@ -38,7 +38,7 @@ float perlin(vec2 p, float dim, float time) {
 // p must be normalized!
 float perlin(vec2 p, float dim) {
 	
-	/*vec2 pos = floor(p * dim);
+	vec2 pos = floor(p * dim);
 	vec2 posx = pos + vec2(1.0, 0.0);
 	vec2 posy = pos + vec2(0.0, 1.0);
 	vec2 posxy = pos + vec2(1.0);

@@ -1031,11 +1031,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\Dev\\WolstencroftEngine\\WolstencroftEngine.csproj",
-      "projectName": "WolstencroftEngine",
-      "projectPath": "F:\\Dev\\WolstencroftEngine\\WolstencroftEngine.csproj",
+      "projectUniqueName": "C:\\Dev\\Deus-Engine\\DeusEngine.csproj",
+      "projectName": "DeusEngine",
+      "projectPath": "C:\\Dev\\Deus-Engine\\DeusEngine.csproj",
       "packagesPath": "C:\\Users\\Madoc\\.nuget\\packages\\",
-      "outputPath": "F:\\Dev\\WolstencroftEngine\\obj\\",
+      "outputPath": "C:\\Dev\\Deus-Engine\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1050,6 +1050,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -1089,7 +1090,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
       }
     }
   }

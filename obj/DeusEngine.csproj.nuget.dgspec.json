@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Dev\\Deus-Engine\\WolstencroftEngine.csproj": {}
+    "C:\\Dev\\Deus-Engine\\DeusEngine.csproj": {}
   },
   "projects": {
-    "C:\\Dev\\Deus-Engine\\WolstencroftEngine.csproj": {
+    "C:\\Dev\\Deus-Engine\\DeusEngine.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Dev\\Deus-Engine\\WolstencroftEngine.csproj",
-        "projectName": "WolstencroftEngine",
-        "projectPath": "C:\\Dev\\Deus-Engine\\WolstencroftEngine.csproj",
+        "projectUniqueName": "C:\\Dev\\Deus-Engine\\DeusEngine.csproj",
+        "projectName": "DeusEngine",
+        "projectPath": "C:\\Dev\\Deus-Engine\\DeusEngine.csproj",
         "packagesPath": "C:\\Users\\Madoc\\.nuget\\packages\\",
         "outputPath": "C:\\Dev\\Deus-Engine\\obj\\",
         "projectStyle": "PackageReference",
