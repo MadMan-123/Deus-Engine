@@ -31,6 +31,8 @@ namespace DeusEngine
         // Entity manager to handle entities
         public EntityManager Entities;
 
+        public ColliderManager colliderManager;
+
         // Delta time between frames
         static public Time DeltaTime;
 
@@ -47,9 +49,7 @@ namespace DeusEngine
         static public Vector2f MousePos;
 
         protected static bool bShouldLog = true;
-        Process currentProcess;
-        long memoryUsageBytes = 0;
-        double memoryUsageMB = 0;
+
 
         // Background music
         public Music BackGroundMusic;
@@ -61,6 +61,7 @@ namespace DeusEngine
                 Instance = this;
             window = new RenderWindow(new VideoMode(iWidth, iHeight), sName);
             Entities = new EntityManager();
+            colliderManager = new ColliderManager();
         }
 
         // Draw a drawable object on the window
@@ -108,7 +109,6 @@ namespace DeusEngine
             while (window.IsOpen)
             {
                 MousePos = (Vector2f)Mouse.GetPosition(Instance.window);
-                currentProcess = Process.GetCurrentProcess();
                 DeltaTime = clock.Restart();
                 window.DispatchEvents();
                 window.Clear();

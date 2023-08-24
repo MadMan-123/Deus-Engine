@@ -21,7 +21,7 @@ namespace DeusEngine
 
         public override void OnStart()
         {
-            Origin = new Vector2f(size.X / 2, size.Y / 2);
+            Origin = size / 2;
         }
     }
 }

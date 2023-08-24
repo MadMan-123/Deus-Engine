@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Dev\\Deus-Engine\\DeusEngine.csproj": {}
+    "F:\\Dev\\Deus-Engine\\DeusEngine.csproj": {}
   },
   "projects": {
-    "C:\\Dev\\Deus-Engine\\DeusEngine.csproj": {
+    "F:\\Dev\\Deus-Engine\\DeusEngine.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Dev\\Deus-Engine\\DeusEngine.csproj",
+        "projectUniqueName": "F:\\Dev\\Deus-Engine\\DeusEngine.csproj",
         "projectName": "DeusEngine",
-        "projectPath": "C:\\Dev\\Deus-Engine\\DeusEngine.csproj",
+        "projectPath": "F:\\Dev\\Deus-Engine\\DeusEngine.csproj",
         "packagesPath": "C:\\Users\\Madoc\\.nuget\\packages\\",
-        "outputPath": "C:\\Dev\\Deus-Engine\\obj\\",
+        "outputPath": "F:\\Dev\\Deus-Engine\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -26,7 +26,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -66,7 +65,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
         }
       }
     }

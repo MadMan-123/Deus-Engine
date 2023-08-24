@@ -1,7 +1,9 @@
 ﻿using SFML.Graphics;
+using SFML.System;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,43 +22,78 @@ namespace DeusEngine
         public Action<Collider2D> OnCollisionEvent;
         public Action<Collider2D> OnExitCollisionEvent;
 
-        //a collider manager 
-        private ColliderManager collisions = new ColliderManager();
+        public HashSet<Collider2D> ColliderList;
         //the collider outline 
         RectangleShape outline = new RectangleShape();
+        public Vector2f OriginOffset { get; set; }
+
 
 
         public Collider2D()
         {
-
+            ColliderList = new HashSet<Collider2D>();
             //setting the collider bounds visual
             outline.OutlineThickness = 1;
-            outline.OutlineColor = Color.Green;
+            outline.OutlineColor = Color.White;
             outline.FillColor = new Color(0, 0, 0, 0);
+            OriginOffset = new Vector2f(-0.5f,-0.5f); // Default origin in the middle
+
+            ColliderManager.Instance.AddCollider(this);
+
         }
 
         public override void OnUpdate()
         {
-            //set all the corrisponding points to the same of the transform
-            Collider.Left = transform.position.X;
-            Collider.Top = transform.position.Y;
+            // Convert rotation to radians
+            float rotationRadians = (float)(transform.fRotation * Math.PI / 180.0f);
+
+            // Calculate the rotation matrix components
+            float rotationCos = (float)Math.Cos(rotationRadians);
+            float rotationSin = (float)Math.Sin(rotationRadians);
+
+            float xOffset = transform.size.X * OriginOffset.X;
+            float yOffset = transform.size.Y * OriginOffset.Y;
+            Vector2f rotatedOffset = new Vector2f(
+                xOffset * rotationCos - yOffset * rotationSin,
+                xOffset * rotationSin + yOffset * rotationCos
+            );
+
+            // Calculate the rotated collider position
+            Vector2f rotatedPosition = new Vector2f(
+                transform.position.X + rotatedOffset.X,
+                transform.position.Y + rotatedOffset.Y
+            );
+
+            // Update the collider's position and size
+            Collider.Left = rotatedPosition.X;
+            Collider.Top = rotatedPosition.Y;
             Collider.Width = transform.size.X;
             Collider.Height = transform.size.Y;
+
+            if (bIsColiding)
+            {
+                outline.OutlineColor = Color.Green;
+            }
+            else if (!bIsColiding)
+            {
+                outline.OutlineColor = Color.Red;
+            }
 
             //if the collider should draw its bounds
             if (bShouldDrawBounds)
             {
-                //set the position and scale to that of the transform
-                outline.Position = transform.position;
+                // Set the position and scale of the outline
+                outline.Position = rotatedPosition;
                 outline.Size = transform.size;
+                outline.Rotation = transform.fRotation; // Set the rotation of the outline
 
-                //draw the collider bounds
+                // Draw the collider bounds
                 Game.Instance.window.Draw(outline);
             }
-
         }
 
-        //checks for collision with other collider
+
+
         public unsafe bool IsColiding(Collider2D other)
         {
             //check if the other variable exists
@@ -65,24 +102,27 @@ namespace DeusEngine
 
             //check if the collisions in the collider are still in
             bool bTemp = Collider.Intersects(other.Collider);
-            if (bTemp && !collisions.colliders.Any(c => c == other))
+            if (bTemp && !ColliderList.Any(c => c == other))
             {
                 //log that entity was added
-                //Game.Log($"{collider}: Added");
+                //Game.Log($"{other}: Added");
                 //add the collider
-                collisions.AddCollider(other);
+                //ColliderList.Add(other);
                 //invoke on collide
                 OnCollisionEvent?.Invoke(other);
+                bIsColiding = true;
+
 
             }
-            else if (!bTemp && collisions.colliders.Any(c => c == other))
+            else if (!bTemp && ColliderList.Any(c => c == other))
             {
                 //log that entity was removed
-                //Game.Log($"{collider}: Removed");
+                Game.Log($"{other}: Removed");
                 //remove the collider
-                collisions.RemoveCollider(other);
+                ColliderList.Remove(other);
                 //invoke on collide
                 OnExitCollisionEvent?.Invoke(other);
+                bIsColiding = false;   
             }
 
             //return value

@@ -23,12 +23,12 @@ namespace DeusEngine
         private bool CanClean = true;
 
         // Collider manager to handle collisions
-        private ColliderManager colliderManager = new ColliderManager();
+        // private ColliderManager colliderManager = new ColliderManager();
 
         // Cleans up the destroyed entities
         public async void CleanUp()
         {
-            if (!CanClean || EntitiesToBeDestroyed.Count == 0)
+            if (!CanClean || EntitiesToBeDestroyed.Count < 1)
                 return;
 
             // Set the flag to false
@@ -52,7 +52,7 @@ namespace DeusEngine
             EntitiesToBeDestroyed.Clear();
 
             // Clean up the collider manager
-            colliderManager.CleanUp();
+            ColliderManager.Instance.CleanUp();
 
             CanClean = true;
         }
@@ -72,7 +72,7 @@ namespace DeusEngine
         // Handles updating physics and collisions
         public void HandlePhysicsUpdates()
         {
-            colliderManager.CheckAllForCollision();
+            ColliderManager.Instance.CheckAllForCollision();
         }
 
         // Adds an entity to the manager
@@ -82,7 +82,7 @@ namespace DeusEngine
             entity.RunStarts();
 
             // Attempt to add a collider to the manager
-            colliderManager.AddCollider(entity);
+            ColliderManager.Instance.AddCollider(entity);
 
             Entities.Add(entity);
 
@@ -105,7 +105,7 @@ namespace DeusEngine
 
             if (cache != null)
             {
-                colliderManager.RemoveCollider(cache);
+                ColliderManager.Instance.RemoveCollider(cache);
             }
 
             // Clean up the components list

@@ -100,20 +100,23 @@ class Program
 
     #endregion
 
-    const float fScale = 20f;
+    const float fScale = 21f;
     public class Player : Entity
     {
         PlayerController _controller;
         Renderable _renderable;
+        Collider2D collider;
 
         public Player()
         {
             _controller = AddComponent<PlayerController>();
             _renderable = AddComponent<Renderable>();
-            _renderable.FillColour = Color.Green;
+            collider = AddComponent<Collider2D>();
+            _renderable.FillColour = Color.White;
             transform.size = new Vector2f(5, 5);
-            
-            ray.fDistance = 20f;
+
+            collider.bShouldDrawBounds = true;
+            //ray.fDistance = 20f;
         }
 
         public override void OnUpdate()
@@ -126,10 +129,19 @@ class Program
     public class Cell : Entity
     {
         Renderable _renderable;
-        public Cell()
+        Collider2D collider;
+        Vector2f CellSize;
+        public int iData = 0;
+        public Cell(Vector2f size, int iNewData)
         {
+            iData = iNewData;
+            CellSize = size;
             _renderable = AddComponent<Renderable>();
-            transform.size = new Vector2f(fScale , fScale );
+            if(iData == 1)
+            {
+                collider = AddComponent<Collider2D>();
+            }
+            transform.size = new Vector2f(CellSize.X, CellSize.Y);
         }
     }
     public class Test : Game
@@ -161,31 +173,29 @@ class Program
                     //calculate the index for a 2d map on a 1d array
                     int iIndex = y * _iWidth + x;
                     //cache the current cells
-                    Cell cache = _cells[iIndex] = new Cell();
+                    Cell cache = _cells[iIndex] = new Cell(new Vector2f(20,20), _iMap[iIndex]);
 
-
+                    if (cache.iData == 0)
+                        continue;
                     //cache the renderable
                     Renderable RenderCache = cache.GetComponent<Renderable>();
                     //set the position 
-                    cache.transform.position = new Vector2f(x * fScale, y * fScale);
-                    //set the color
-                    if (_iMap[iIndex] == 0)
-                    {
-                        RenderCache.FillColour = (Color.Black);
-                    }
-                    else if (_iMap[iIndex] == 1)
+                    cache.transform.position = new Vector2f(x * fScale + fScale, y * fScale + fScale);
+                    //set the color and to delete
+
+                    if (_iMap[iIndex] == 1)
                     {
                         RenderCache.FillColour = (Color.White);
                     }
 
                     //add it to the game
-                    Game.Instantiate(cache);
+                    Instantiate(cache);
+                    cache.GetComponent<Collider2D>().bShouldDrawBounds = true;
 
                 }
             }
 
             Instantiate(_player);
-           
         }
 
 

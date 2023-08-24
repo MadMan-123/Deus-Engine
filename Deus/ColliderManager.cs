@@ -8,8 +8,19 @@ namespace DeusEngine
 {
     class ColliderManager
     {
+        public static ColliderManager Instance;
         //hash map for the colliders
-        public HashSet<Collider2D> colliders = new HashSet<Collider2D>();
+        public HashSet<Collider2D> colliders;
+
+        public ColliderManager() 
+        {
+            if(Instance == null)
+            {
+                Instance = this;
+                colliders = new HashSet<Collider2D>();
+            }
+            
+        }
 
         //handles removing a collider
         public void RemoveCollider(Collider2D col)
@@ -32,7 +43,7 @@ namespace DeusEngine
             if (col != null)
             {
                 //add the collider to hashset
-                colliders.Add(col);
+                AddCollider(col);
             }
         }
 
@@ -42,6 +53,8 @@ namespace DeusEngine
             //if the collider exists, return
             if (colliders.Contains(col))
                 return;
+
+            Game.Log($"{col} is added");
 
             //add to hashset
             colliders.Add(col);
@@ -53,7 +66,7 @@ namespace DeusEngine
         public void CheckAllForCollision()
         {
             // Get the count of colliders
-            int colliderCount = colliders.Count;
+            //int colliderCount = colliders.Count;
 
             // Create a copy of the colliders using a HashSet
             HashSet<Collider2D> collidersCopy = new HashSet<Collider2D>(colliders);
