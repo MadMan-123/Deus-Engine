@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace DeusEngine
 {
     //handle the transform of an object
-    class Transform2D : Component
+    public class Transform2D : Component
     {
         //position
         public Vector2f position = new Vector2f(0, 0);

@@ -16,11 +16,11 @@ class Program
         float fScale = 0.025f;
         public override void OnUpdate()
         {
-            if (Game.IsKeyPressed(Keyboard.Key.W))
+            if (Application.IsKeyPressed(Keyboard.Key.W))
             {
                 fAxisY -= fScale;
             }
-            else if (Game.IsKeyPressed(Keyboard.Key.S))
+            else if (Application.IsKeyPressed(Keyboard.Key.S))
             {
                 fAxisY += fScale;
             }
@@ -29,11 +29,11 @@ class Program
                 fAxisY = 0;
             }
 
-            if (Game.IsKeyPressed(Keyboard.Key.D))
+            if (Application.IsKeyPressed(Keyboard.Key.D))
             {
                 fAxisX += fScale;
             }
-            else if (Game.IsKeyPressed(Keyboard.Key.A))
+            else if (Application.IsKeyPressed(Keyboard.Key.A))
             {
                 fAxisX -= fScale;
             }
@@ -43,13 +43,13 @@ class Program
             }
 
             //handle rotation
-            if(Game.IsKeyPressed (Keyboard.Key.Right))
+            if(Application.IsKeyPressed (Keyboard.Key.Right))
             {
-                transform.fRotation += 90f * Game.DeltaTime.AsSeconds();
+                transform.fRotation += 90f * Application.DeltaTime.AsSeconds();
             }
-            else if(Game.IsKeyPressed(Keyboard.Key.Left))
+            else if(Application.IsKeyPressed(Keyboard.Key.Left))
             {
-                transform.fRotation -= 90f * Game.DeltaTime.AsSeconds();
+                transform.fRotation -= 90f * Application.DeltaTime.AsSeconds();
 
             }
 
@@ -61,7 +61,7 @@ class Program
 
             //move the player towards the mouse
 
-            Vector2f _vResult = new Vector2f(fAxisX, fAxisY) * fSpeed * Game.DeltaTime.AsSeconds();
+            Vector2f _vResult = new Vector2f(fAxisX, fAxisY) * fSpeed * Application.DeltaTime.AsSeconds();
 
 
             entity.transform.position += (_vResult);
@@ -93,7 +93,7 @@ class Program
         void HandleDeath()
         {
             OnDeath?.Invoke(this);
-            Game.Destroy(entity);
+            Application.Destroy(entity);
         }
 
     }
@@ -144,7 +144,7 @@ class Program
             transform.size = new Vector2f(CellSize.X, CellSize.Y);
         }
     }
-    public class Test : Game
+    public class Test : Application
     {
         Player _player; 
         const int _iWidth = 6, _iHeight = 6;
@@ -159,6 +159,11 @@ class Program
             1,1,1,1,1,1
         };
 
+        public Test() 
+        {
+            iWidth = 1920 / 2;
+            iHeight = 1080 / 2;
+        }
 
         public override void OnStart()
         {
@@ -201,8 +206,8 @@ class Program
 
     }
 
+    
 
-  
     static void Main()
     {
         Test game = new Test();

@@ -8,13 +8,13 @@ using System.Diagnostics;
 namespace DeusEngine
 {
 
-    #region Game
+    #region Application
 
     //main game logic
-    class Game
+    public class Application
     {
         // Singleton instance of the game
-        public static Game Instance;
+        public static Application Instance;
 
         // Render window for the game
         public RenderWindow window;
@@ -55,13 +55,14 @@ namespace DeusEngine
         public Music BackGroundMusic;
 
         // Constructor
-        public Game()
+        public Application()
         {
             if (Instance == null)
                 Instance = this;
-            window = new RenderWindow(new VideoMode(iWidth, iHeight), sName);
             Entities = new EntityManager();
             colliderManager = new ColliderManager();
+            OnInit();
+
         }
 
         // Draw a drawable object on the window
@@ -71,9 +72,13 @@ namespace DeusEngine
                 window.Draw(drawable);
         }
 
+
+
         // Start the game
         public void Start()
         {
+            window = new RenderWindow(new VideoMode(iWidth, iHeight), sName);
+
             RunTimeClock.Restart();
             window.Closed += HandleClose;
             window.KeyPressed += HandleKeyPress;
@@ -153,6 +158,7 @@ namespace DeusEngine
         // Event handler for window close
         void HandleClose(object sender, EventArgs e)
         {
+            OnEnd();
             Entities.CleanUp();
             window.Close();
             window.Closed -= HandleClose;
@@ -211,6 +217,13 @@ namespace DeusEngine
         public virtual void OnStart()
         {
         }
+
+        public virtual void OnInit() 
+        { }
+
+        public virtual void OnEnd() 
+        { }
+
     }
 
     #endregion

@@ -9,7 +9,7 @@ namespace DeusEngine
 {
     #region Maths
     //maths class for specific functions
-    static class DMath
+    public static class DMath
     {
         static public float PI = 3.1415926535f;
         //normalize a vector

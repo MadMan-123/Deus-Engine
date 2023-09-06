@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace DeusEngine
 {
-    class Component
-    {
+    public class Component
+    { 
         //reference to the game
-        protected Game game;
+        protected Application application;
         //reference to Parent Entity
         public Entity entity { get; set; }
         //reference to the transform
@@ -21,7 +21,7 @@ namespace DeusEngine
 
         public Component() =>
             //set the game reference 
-            game = Game.Instance;
+            application = Application.Instance;
 
         //set the entity parent as reference 
         public void SetEntityParent(ref Entity entity)

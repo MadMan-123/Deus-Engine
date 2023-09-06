@@ -61,11 +61,11 @@ namespace DeusEngine
             // Draw the body with the shader if it's set
             if (shader != null)
             {
-                Game.Instance.window.Draw(Body, new RenderStates(shader));
+                Application.Instance.window.Draw(Body, new RenderStates(shader));
             }
             else
             {
-                Game.Instance.Draw(Body);
+                Application.Instance.Draw(Body);
             }
 
         }

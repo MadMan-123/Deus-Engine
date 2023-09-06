@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DeusEngine
 {
-    class ColliderManager
+    public class ColliderManager
     {
         public static ColliderManager Instance;
         //hash map for the colliders
@@ -54,7 +54,7 @@ namespace DeusEngine
             if (colliders.Contains(col))
                 return;
 
-            Game.Log($"{col} is added");
+            //Game.Log($"{col} is added");
 
             //add to hashset
             colliders.Add(col);
@@ -65,36 +65,32 @@ namespace DeusEngine
         //handles checking the collision in all the colliders
         public void CheckAllForCollision()
         {
-            // Get the count of colliders
-            //int colliderCount = colliders.Count;
-
-            // Create a copy of the colliders using a HashSet
-            HashSet<Collider2D> collidersCopy = new HashSet<Collider2D>(colliders);
-
-            // Iterate over each collider in the collidersCopy HashSet
-            foreach (Collider2D col in collidersCopy)
+            // Iterate over each collider in the colliders HashSet
+            foreach (Collider2D col in colliders)
             {
-                // Iterate over each collider again for collision checking
-                foreach (Collider2D colx in collidersCopy)
+                // Perform null checks
+                if (col == null)
+                    continue;
+
+                // Reset the collision flag for this collider
+                col.bIsColiding = false;
+
+                // Iterate over each other collider for collision checking
+                foreach (Collider2D colx in colliders)
                 {
-                    // Skip if it's the same collider
-                    if (col == colx)
+                    // Perform null checks
+                    if (colx == null || col == colx)
                         continue;
 
-                    // Perform null checks
-                    if (col == null || colx == null)
-                        break;
-
                     // Check collision between the colliders
-                    bool bProduct = col.IsColiding(colx);
-                    col.bIsColiding = bProduct;
+                    if (col.CheckCollision(colx))
+                    {
+                        col.bIsColiding = true;
+                        break; // Exit the inner loop once a collision is detected
+                    }
                 }
             }
         }
-
-
-
-
         //clean up the hashset
         public void CleanUp()
         {

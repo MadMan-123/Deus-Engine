@@ -8,7 +8,7 @@ namespace DeusEngine
 {
 
     //handles multiple entitys
-    class EntityManager
+    public class EntityManager
     {
         // List of active entities
         public List<Entity> Entities = new List<Entity>();
@@ -34,7 +34,7 @@ namespace DeusEngine
             // Set the flag to false
             CanClean = false;
 
-            Game.Log("Start Clean Memory");
+            Application.Log("Start Clean Memory");
 
             // Collect the memory
             GC.Collect();
@@ -78,7 +78,7 @@ namespace DeusEngine
         // Adds an entity to the manager
         public Entity AddEntity(Entity entity)
         {
-            Game.Log($"Added: {entity.Name}");
+            Application.Log($"Added: {entity.Name}");
             entity.RunStarts();
 
             // Attempt to add a collider to the manager
@@ -92,7 +92,7 @@ namespace DeusEngine
         // Destroys an entity
         public void Destroy(Entity entity)
         {
-            Game.Log($"Added: {entity.Name} To Be Destroyed");
+            Application.Log($"Added: {entity.Name} To Be Destroyed");
 
             // Remove the entity from the list
             Entities.Remove(entity);

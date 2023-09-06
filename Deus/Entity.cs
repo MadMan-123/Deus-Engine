@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DeusEngine
 {
-    class Entity
+    public class Entity
     {
         // List of components attached to the entity
         public List<Component> components = new List<Component>();
