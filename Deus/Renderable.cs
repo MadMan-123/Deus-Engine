@@ -1,9 +1,5 @@
 ﻿using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace DeusEngine
 {
@@ -61,11 +57,11 @@ namespace DeusEngine
             // Draw the body with the shader if it's set
             if (shader != null)
             {
-                Application.Instance.window.Draw(Body, new RenderStates(shader));
+                Application.window.Draw(Body, new RenderStates(shader));
             }
             else
             {
-                Application.Instance.Draw(Body);
+                Application.Draw(Body);
             }
 
         }

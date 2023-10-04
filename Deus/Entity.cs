@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace DeusEngine
 {
     public class Entity
@@ -21,7 +16,7 @@ namespace DeusEngine
         private Entity entityRef;
 
         // List of tags associated with the entity
-        public List<string> sTags = new List<string>();
+        public string sTag = "";
 
         // Executes when the entity starts
         public virtual void OnStart() { }
@@ -83,9 +78,15 @@ namespace DeusEngine
         }
 
         // Checks if the entity has a specific tag
-        public bool CompareTag(string sTag) => sTags.Any(s => s == sTag);
+        public bool CompareTag(string sNewTag) => sTag == sNewTag;
 
         // Checks if the entity has any of the specified tags
-        public bool CompareTags(List<string> strings) => sTags.Any(x => strings.Any(y => EqualityComparer<string>.Default.Equals(x, y)));
+        //public bool CompareTags(List<string> strings) => sTags.Any(x => strings.Any(y => EqualityComparer<string>.Default.Equals(x, y)));
+
+        //add a tag to the entity
+        public void SetTag(string sNewTag)
+        {
+            sTag = sNewTag;
+        }
     }
 }

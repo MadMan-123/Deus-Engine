@@ -23,7 +23,7 @@ namespace DeusEngine
         {
             text.Position = transform.position;
             text.Rotation = transform.fRotation;
-            Application.Instance.Draw(text);
+            Application.Draw(text);
         }
 
         public void SetText(string Text)

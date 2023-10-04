@@ -17,7 +17,7 @@ namespace DeusEngine
         public static Application Instance;
 
         // Render window for the game
-        public RenderWindow window;
+        public static RenderWindow window;
 
         // Width and height of the window
         public uint iWidth = 400, iHeight = 400;
@@ -44,7 +44,7 @@ namespace DeusEngine
         private Clock frameTimer = new Clock();
 
         // Font for text display
-        static public Font EngineFont = new Font("..\\..\\..\\consolas/consola.ttf");
+        static public Font BaseFont = new Font("F:\\Dev\\Deus-Engine\\Deus\\consolas\\consola.ttf");
 
         static public Vector2f MousePos;
 
@@ -66,7 +66,7 @@ namespace DeusEngine
         }
 
         // Draw a drawable object on the window
-        public void Draw(Drawable drawable)
+        public static void Draw(Drawable drawable)
         {
             if (window != null && drawable != null)
                 window.Draw(drawable);
@@ -78,7 +78,7 @@ namespace DeusEngine
         public void Start()
         {
             window = new RenderWindow(new VideoMode(iWidth, iHeight), sName);
-
+                
             RunTimeClock.Restart();
             window.Closed += HandleClose;
             window.KeyPressed += HandleKeyPress;
@@ -90,10 +90,10 @@ namespace DeusEngine
 
         // Size of the text displayed
         static uint iSize = 15;
-        bool bShouldShowDebug = false;
-        Text FPSCounter = new Text("", EngineFont, iSize);
-        Text EntityCount = new Text("", EngineFont, iSize);
-        Text EntitiesToDestroyCount = new Text("", EngineFont, iSize);
+        protected bool bShouldShowDebug = false;
+        Text FPSCounter = new Text("", BaseFont, iSize);
+        Text EntityCount = new Text("", BaseFont, iSize);
+        Text EntitiesToDestroyCount = new Text("", BaseFont, iSize);
         //Text MemoryCounter = new Text("", EngineFont, iSize);
 
         // Update loop for the game
@@ -113,16 +113,16 @@ namespace DeusEngine
 
             while (window.IsOpen)
             {
-                MousePos = (Vector2f)Mouse.GetPosition(Instance.window);
+                MousePos = (Vector2f)Mouse.GetPosition(window);
                 DeltaTime = clock.Restart();
                 window.DispatchEvents();
                 window.Clear();
 
                 // Call game update
                 OnUpdate();
-
                 // Call all entity updates
                 HandleEntityUpdates();
+
 
                 Entities.CleanUp();
 
@@ -176,6 +176,14 @@ namespace DeusEngine
             return Keyboard.IsKeyPressed(key);
         }
 
+        //check if a specific mouse button is pressed
+        static public bool IsMouseButtonPressed(Mouse.Button button)
+        {
+            return Mouse.IsButtonPressed(button);
+        }
+
+
+
         // Log a message
         static public void Log<T>(T Data)
         {
@@ -224,7 +232,59 @@ namespace DeusEngine
         public virtual void OnEnd() 
         { }
 
-    }
+        public static void DrawPoint(Vector2f position, Color color, float fRadius)
+        {
+            if (window != null)
+            {
+                //handle drawing a circle with fRadius as the radius
+                CircleShape circle = new CircleShape(fRadius);
+                circle.Position = position;
+                circle.FillColor = color;
+                window.Draw(circle);
+            }
+        }
 
+        public static void DrawLine(Vector2f Start, Vector2f End, Color debugLineColor)
+        {
+           //add line to vertex array
+           if (window != null)
+            {
+                VertexArray lines = new VertexArray(PrimitiveType.Lines);
+                lines.Append(new Vertex(Start, debugLineColor));
+                lines.Append(new Vertex(End, debugLineColor));
+
+                window.Draw(lines);
+            }
+
+        }
+
+        public static void DrawRay(Vector2f Position,Vector2f Direction, float fLength, Color debugLineColor)
+        {
+            if(window != null)
+            {
+                //store the vertex array
+                VertexArray lines = new VertexArray(PrimitiveType.Lines);
+                //from starting point
+                lines.Append(new Vertex(Position, debugLineColor));
+                //to starting point + (direction * length)
+                lines.Append(new Vertex(Position + (Direction * fLength), debugLineColor));
+                //draw line
+                window.Draw(lines);
+            }
+        }
+        // DrawRect function to draw a colored rectangle using vertices
+        public static void DrawRect( float x, float y, float width, float height, Color color)
+        {
+            VertexArray vertices = new VertexArray(PrimitiveType.Quads, 4);
+
+            // Define the vertices of the rectangle
+            vertices[0] = new Vertex(new Vector2f(x, y), color);
+            vertices[1] = new Vertex(new Vector2f(x + width, y), color);
+            vertices[2] = new Vertex(new Vector2f(x + width, y + height), color);
+            vertices[3] = new Vertex(new Vector2f(x, y + height), color);
+
+            Application.Draw(vertices);
+        }
+    }
     #endregion
 }
