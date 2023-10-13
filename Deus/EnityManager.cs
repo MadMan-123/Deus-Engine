@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Silk.NET.Windowing;
 
 namespace DeusEngine
 {
@@ -52,7 +53,7 @@ namespace DeusEngine
             EntitiesToBeDestroyed.Clear();
 
             // Clean up the collider manager
-            ColliderManager.Instance.CleanUp();
+            //ColliderManager.Instance.CleanUp();
 
             CanClean = true;
         }
@@ -62,11 +63,7 @@ namespace DeusEngine
         {
             HandlePhysicsUpdates();
 
-            for (int i = 0; i < Entities.Count; i++)
-            {
-                if (Entities[i] != null)
-                    Entities[i].RunUpdates();
-            }
+
         }
 
         // Handles updating physics and collisions
@@ -81,8 +78,12 @@ namespace DeusEngine
             Application.Log($"Added: {entity.Name}");
             entity.RunStarts();
 
+            
             // Attempt to add a collider to the manager
             ColliderManager.Instance.AddCollider(entity);
+            Renderable cache = entity.GetComponent<Renderable>();
+            if(cache != null)
+                RenderingEngine.AddRenderable(cache);
 
             Entities.Add(entity);
 
@@ -94,6 +95,7 @@ namespace DeusEngine
         {
             Application.Log($"Added: {entity.Name} To Be Destroyed");
 
+            
             // Remove the entity from the list
             Entities.Remove(entity);
 
@@ -112,6 +114,7 @@ namespace DeusEngine
             entity.components.TrimExcess();
 
             // Add the entity to the list of entities to be destroyed
+            
             EntitiesToBeDestroyed.Add(entity);
         }
     }

@@ -10,11 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SFML.Net" Version="2.5.1" />
+    <Folder Include="Build\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Build\" />
+    <PackageReference Include="Silk.Net" Version="2.17.1" />
+    <PackageReference Include="StbImageSharp" Version="2.27.13" />
   </ItemGroup>
 
 </Project>

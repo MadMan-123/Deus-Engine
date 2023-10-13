@@ -1,6 +1,4 @@
 ﻿
-using SFML.Graphics;
-using SFML.System;
 
 namespace DeusEngine
 {
@@ -162,7 +160,7 @@ namespace DeusEngine
                 }
             }
         }
-        public struct CircleCastHit
+        /*public struct CircleCastHit
         {
             public Vector2f Point;      // The point of intersection
             public Vector2f Normal;     // The surface normal at the point of intersection
@@ -176,7 +174,7 @@ namespace DeusEngine
                 IsHit = isHit;
                 Collider = collider;
             }
-        }
+        }*/
         /*
         public bool RayCast(Vector2f origin, Vector2f direction, float maxDistance, out RaycastHit? hit)
         {
@@ -229,7 +227,7 @@ namespace DeusEngine
             return false; // No collision detected
         }
         */
-        public bool RayCast(Vector2f origin, Vector2f direction, float maxDistance, List<string> sTagsToIgnore, out RaycastHit? hit)
+        /*public bool RayCast(Vector2f origin, Vector2f direction, float maxDistance, List<string> sTagsToIgnore, out RaycastHit? hit)
         {
             hit = null;
 
@@ -341,6 +339,6 @@ namespace DeusEngine
 
             // Check if the distance is less than or equal to the sum of the radii
             return distance <= (radius1 + radius2);
-        }
+        }*/
     }
 }

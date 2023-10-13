@@ -3,20 +3,18 @@ namespace DeusEngine
 {
     public class Component
     { 
-        //reference to the game
-        protected Application application;
         //reference to Parent Entity
         public Entity entity { get; set; }
         //reference to the transform
-        public Transform2D transform;
+        public Transform transform;
 
         //overridable functions 
-        public virtual void OnUpdate() { }
+        //on update
+        public virtual void OnUpdate(double t) { }
+        public virtual void OnLoad() { }
         public virtual void OnStart() { }
+        public virtual void OnDestroy(){}
 
-        public Component() =>
-            //set the game reference 
-            application = Application.Instance;
 
         //set the entity parent as reference 
         public void SetEntityParent(ref Entity entity)

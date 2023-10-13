@@ -45,9 +45,13 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
-            "SFML.Net": {
+            "Silk.Net": {
               "target": "Package",
-              "version": "[2.5.1, )"
+              "version": "[2.17.1, )"
+            },
+            "StbImageSharp": {
+              "target": "Package",
+              "version": "[2.27.13, )"
             }
           },
           "imports": [

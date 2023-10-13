@@ -1,4 +1,6 @@
 ﻿
+using Silk.NET.Windowing;
+
 namespace DeusEngine
 {
     public class Entity
@@ -7,7 +9,7 @@ namespace DeusEngine
         public List<Component> components = new List<Component>();
 
         // Transform component for position, size, and rotation
-        public Transform2D transform;
+        public Transform transform;
 
         // Name of the entity
         public string Name = "Entity";
@@ -19,24 +21,29 @@ namespace DeusEngine
         public string sTag = "";
 
         // Executes when the entity starts
-        public virtual void OnStart() { }
+        public virtual void OnLoad() { }
 
         // Executes when the entity updates
-        public virtual void OnUpdate() { }
+        public virtual void OnUpdate(double t) { }
 
+        public virtual void OnStart() {}
+        
+        
         // Constructor
         public Entity()
         {
             entityRef = this;
             // Add the Transform2D component by default
-            transform = AddComponent<Transform2D>();
+            transform = AddComponent<Transform>();
             Name = ToString();
+
         }
 
         // Runs the OnStart method of the entity and all attached components
         public void RunStarts()
         {
             OnStart();
+
             foreach (Component component in components)
             {
                 component.OnStart();
@@ -44,13 +51,14 @@ namespace DeusEngine
         }
 
         // Runs the OnUpdate method of the entity and all attached components
-        public void RunUpdates()
+        public void SubscribeComponents(IWindow window)
         {
-            OnUpdate();
             foreach (Component component in components)
             {
-                component.OnUpdate();
+                window.Load += component.OnLoad;
+                window.Update += component.OnUpdate;
             }
+            
         }
 
         // Adds a component of type T to the entity
