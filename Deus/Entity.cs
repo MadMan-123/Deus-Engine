@@ -9,7 +9,7 @@ namespace DeusEngine
         public List<Component> components = new List<Component>();
 
         // Transform component for position, size, and rotation
-        public Transform transform;
+        public Transform transform = new Transform();
 
         // Name of the entity
         public string Name = "Entity";

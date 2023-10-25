@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using Silk.NET;
+using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
@@ -9,6 +10,37 @@ using Silk.NET.Windowing;
 
 namespace DeusEngine
 {
+    public class FPSTimer
+    {
+        private Stopwatch stopwatch;
+        private int frameCount;
+
+        public int FPS { get; private set; }
+
+        public FPSTimer()
+        {
+            stopwatch = new Stopwatch();
+            frameCount = 0;
+            stopwatch.Start();
+        }
+
+        public void Frame()
+        {
+            frameCount++;
+            if (stopwatch.Elapsed.TotalSeconds >= 1)
+            {
+                FPS = (int)(frameCount / stopwatch.Elapsed.TotalSeconds);
+                frameCount = 0;
+                stopwatch.Restart();
+            }
+        }
+    }
+
+
+
+
+
+
 
     #region Application
 
@@ -18,7 +50,6 @@ namespace DeusEngine
         // Singleton instance of the game
         public static Application Instance;
 
-        public RenderingEngine renderingEngine;
 
         // Name of the window
         public string sName = "Window";
@@ -27,27 +58,18 @@ namespace DeusEngine
         //static Clock RunTimeClock = new Clock();
 
         // Entity manager to handle entities
-        public EntityManager Entities;
+        private EntityManager Entities;
 
-        public ColliderManager colliderManager;
-
-        // Delta time between frames
-        static public float DeltaTime;
-
-        // Frames per second
-        static public int FPS;
-       //private Clock fpsClock;
-
-        private int frameCount = 0;
-        //private Clock frameTimer = new Clock();
+        private ColliderManager colliderManager;
+        private RenderingEngine renderingEngine;
+        private InputManager inputManager;
+        private FPSTimer timer = new FPSTimer();
 
         // Font for text display
         //static public Font BaseFont = new Font("F:\\Dev\\Deus-Engine\\Deus\\consolas\\consola.ttf");
-
-        static public Vector2D<float> MousePos;
-
-        protected static bool bShouldLog = true;
         
+        protected static bool bShouldLog = true;
+        public Vector2 MousePosition = new Vector2();
 
         // Constructor
         public Application()
@@ -57,7 +79,6 @@ namespace DeusEngine
             Entities = new EntityManager();
             colliderManager = new ColliderManager();
             renderingEngine = new RenderingEngine();
-
             OnInit();
 
         }
@@ -66,14 +87,20 @@ namespace DeusEngine
         // Start the game
         public void Start()
         {
+            OnStart();
 
             RenderingEngine.Instance.OnStart();
         }
 
+        public virtual void OnStart()
+        {
+            
+        }
+
         public void SubscribeEvents()
         {
-            RenderingEngine.window.Load += this.OnLoad;
-            RenderingEngine.window.Update += this.OnUpdate;
+            RenderingEngine.window.Load += HandleLoad;
+            RenderingEngine.window.Update += HandleUpdate;
         }
         
         // Size of the text displayed
@@ -125,31 +152,58 @@ namespace DeusEngine
             Instance.Entities.Destroy(entity);
         }
 
-
-        // Game update method to be overridden in derived classes
-        public virtual void OnUpdate(double t)
+        public void HandleUpdate(double t)
         {
-            
             if(Entities.EntitiesToBeDestroyed.Count > 0)
                 Entities.CleanUp();
+            //if debug is on, set the title of the window to the stats
+            if (bShouldLog)
+            {
+                RenderingEngine.window.Title = $"FPS:{timer.FPS}, Size:{RenderingEngine.window.Size}, Entities:{Entities.Entities.Count}";
+            }
+            OnUpdate(t);
+            timer.Frame();
+
         }
-        // Game start method to be overridden in derived classes
-        public virtual void OnLoad()
+
+        public void HandleLoad()
         {
+            IInputContext input = RenderingEngine.window.CreateInput();
+            
+            inputManager = new InputManager(
+                input.Keyboards[0],
+                input.Mice[0]
+                );
+
+            OnLoad();
         }
+        
+        // Game update method to be overridden in derived classes
+        public virtual void OnUpdate(double t) { }
+        // Game start method to be overridden in derived classes
+        public virtual void OnLoad() { }
+        public virtual void OnInit() { }
+        public virtual void OnEnd() { }
 
-        public virtual void OnInit() 
-        { }
-
-        public virtual void OnEnd() 
-        { }
-
- 
+        public void KeyDown(IKeyboard arg1, Key arg2, int arg3)
+        {
+            
+        }
         
         // DrawRect function to draw a colored rectangle using vertices
         public static void DrawRect( float x, float y, float width, float height)
         {
           
+        }
+
+        public static bool IsKeyPressed(Key key)
+        {
+            return InputManager.Instance.IsKeyDown(key);
+        }
+
+        public static bool IsMousePressed(MouseButton button)
+        {
+            return InputManager.Instance.IsMouseButtonDown(button);
         }
     }
     #endregion

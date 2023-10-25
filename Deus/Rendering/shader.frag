@@ -1,19 +1,28 @@
-﻿//Specifying the version like in our vertex shader.
-#version 330 core
-//The input variables, again prefixed with an f as they are the input variables of our fragment shader.
-//These have to share name for now even though there is a way around this later on.
+﻿#version 330 core
+
 in vec2 fUv;
-  
-//The output of our fragment shader, this just has to be a vec3 or a vec4, containing the color information about
-//each "fragment" or pixel of our geometry.
+uniform sampler2D uTexture;
 out vec4 FragColor;
 
-//This is how we declare a uniform, they can be used in all our shaders and share the same name.
-//This is prefixed with a u as it's our uniform.
-uniform sampler2D uTexture;
+void main() {
+    // Sample the original color
+    vec4 texColor = texture(uTexture, fUv);
 
-void main()
-{
-    //Here we are setting our output variable, for which the name is not important.
-    FragColor = texture(uTexture, fUv);
+    // Apply color quantization to reduce color bit depth
+    texColor.rgb = floor(texColor.rgb * 8.0) / 8.0; // Reduces to 2 bits per channel
+
+    //apply dithering
+    float ditherAmount = 0.05f;
+    float noise = fract(sin(dot(fUv.xy, vec2(12.9898, 78.233))) * 43758.5453);
+    texColor.rgb += noise * ditherAmount;
+    
+    
+
+    // Add a vignette effect
+    vec2 fromCenter = fUv - vec2(0.5, 0.5);
+    float vignetteAmount = 0.3;
+    float vignette = 1.0 + vignetteAmount * dot(fromCenter, fromCenter);
+    texColor.rgb *= vignette;
+
+    FragColor = texColor;
 }

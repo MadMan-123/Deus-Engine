@@ -76,17 +76,19 @@ namespace DeusEngine
         public Entity AddEntity(Entity entity)
         {
             Application.Log($"Added: {entity.Name}");
+
             entity.RunStarts();
 
-            
             // Attempt to add a collider to the manager
             ColliderManager.Instance.AddCollider(entity);
             Renderable cache = entity.GetComponent<Renderable>();
             if(cache != null)
                 RenderingEngine.AddRenderable(cache);
-
+            
             Entities.Add(entity);
 
+            
+            
             return entity;
         }
 

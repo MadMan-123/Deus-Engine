@@ -12,6 +12,7 @@ namespace DeusEngine
         static public Vector2D<float> VectorZero = new Vector2D<float>(0,0);
         //convert degrees to radians
         static public float DegToRad(float degrees) => degrees * (PI / 180);
+        static public float DegToRad(Double degrees) => (float)(degrees * (PI / 180));
         //convert radians to degrees
         static public float RadToDeg(float radians) => radians * (180 / PI);
         //normalize a vector
