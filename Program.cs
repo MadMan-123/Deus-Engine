@@ -28,7 +28,6 @@ class Program
         class EntityOBJ : Entity
         {
                 private Renderable _renderable;
-                private float fRotation = 1f;
                 public EntityOBJ()
                 {
                         _renderable = AddComponent<Renderable>();
@@ -37,19 +36,12 @@ class Program
 
                 public override void OnUpdate(double t)
                 {
-                        /*float fDeltaTime = (float)t;
+                        float fDeltaTime = (float)t;
+                        
+                        //rotate the cube on the y axis
+                        transform.Rotation *= Quaternion.CreateFromAxisAngle(Vector3.UnitY, 1f * fDeltaTime);
     
-                        // Create a rotation quaternion and apply it incrementally
-                        Quaternion rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, fRotation * fDeltaTime);
-    
-                        // Modify the transform rotation without affecting scale
-                        transform.Rotation *= rotation;
-    
-                        // Reset the rotation angle if it exceeds 360 degrees
-                        if (fRotation >= 360)
-                        {
-                                fRotation = 0;
-                        }*/
+  
                 }
         }
         
