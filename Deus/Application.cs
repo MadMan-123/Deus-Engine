@@ -71,7 +71,40 @@ namespace DeusEngine
         protected static bool bShouldLog = true;
         public static Vector2 MousePosition = new Vector2();
         public static int MouseScroll = 0;
+        public static string sCurrentPath = System.IO.Directory.GetCurrentDirectory();
+        public static string sCurrentProjectPath
+        {
+            get
+            {
+                string currentPath = sCurrentPath;
+        
+                // Navigate up from the current directory
+                string parentDirectory = System.IO.Directory.GetParent(currentPath)?.FullName;
 
+                while (!string.IsNullOrEmpty(parentDirectory))
+                {
+                    // Check if the current directory contains "Deus" and "Assets" folders
+                    if (System.IO.Directory.Exists(System.IO.Path.Combine(currentPath, "Deus")) &&
+                        System.IO.Directory.Exists(System.IO.Path.Combine(currentPath, "Assets")))
+                    {
+                        return currentPath;
+                    }
+
+                    // Navigate up one level in the directory structure
+                    currentPath = parentDirectory;
+                    parentDirectory = System.IO.Directory.GetParent(currentPath)?.FullName;
+                }
+
+                return string.Empty; // Not in a Deus Engine project
+            }
+        }
+
+        public static string sAssetsPath = sCurrentProjectPath + "/Assets/";
+
+
+        
+
+        
         private ImGuiManager imguiManager;
         // Constructor
         public Application()
@@ -83,8 +116,7 @@ namespace DeusEngine
             renderingEngine = new RenderingEngine();
             OnInit();
             //imguiManager = new ImGuiManager();
-
-
+            Application.Log(sCurrentProjectPath);
         }
         
 
@@ -122,7 +154,7 @@ namespace DeusEngine
             //imguiManager.Dispose();
             OnEnd();
             Entities.CleanUp();
-            RenderingEngine.window.Close();
+            
 
         }
         

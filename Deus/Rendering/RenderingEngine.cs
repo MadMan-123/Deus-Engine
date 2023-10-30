@@ -36,8 +36,8 @@ public class RenderingEngine
         window = Window.Create(options);
                 
         window.Render += OnRender;
-        window.Closing += OnClose;
         window.Closing += Application.Instance.HandleClose;
+        window.Closing += OnClose;
         window.Load += OnLoad;
         window.Resize += OnResize;
 

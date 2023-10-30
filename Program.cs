@@ -141,7 +141,7 @@ class Program
                         Bullet bullet = new Bullet(); 
 
                         // Set the bullet's position to the camera's position
-                        bullet.transform.Position = _camera.transform.Position + (_camera.transform.Forward);
+                        bullet.transform.Position = _camera.transform.Position + (_camera.transform.Forward * 0.2f);
 
                         // Set the desired rotation to the camera's rotation
                         DesiredRotation = _camera.transform.Rotation;
