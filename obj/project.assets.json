@@ -97,6 +97,24 @@
           "Silk.NET.Windowing": "2.17.1"
         }
       },
+      "Silk.NET.Assimp/2.18.0": {
+        "type": "package",
+        "dependencies": {
+          "Silk.NET.Core": "2.18.0",
+          "Silk.NET.Maths": "2.18.0",
+          "Ultz.Native.Assimp": "5.3.1"
+        },
+        "compile": {
+          "lib/net5.0/Silk.NET.Assimp.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net5.0/Silk.NET.Assimp.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Silk.NET.Core/2.18.0": {
         "type": "package",
         "dependencies": {
@@ -386,6 +404,22 @@
           }
         }
       },
+      "SixLabors.ImageSharp/3.0.2": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/SixLabors.ImageSharp.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/SixLabors.ImageSharp.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "build/SixLabors.ImageSharp.props": {}
+        }
+      },
       "StbImageSharp/2.27.13": {
         "type": "package",
         "compile": {
@@ -477,6 +511,37 @@
         },
         "build": {
           "buildTransitive/net6.0/System.Text.Json.targets": {}
+        }
+      },
+      "Ultz.Native.Assimp/5.3.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/_._": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/_._": {}
+        },
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/libassimp.so.5": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/osx-arm64/native/libassimp.5.dylib": {
+            "assetType": "native",
+            "rid": "osx-arm64"
+          },
+          "runtimes/osx-x64/native/libassimp.5.dylib": {
+            "assetType": "native",
+            "rid": "osx-x64"
+          },
+          "runtimes/win-x64/native/Assimp64.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/Assimp32.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          }
         }
       },
       "Ultz.Native.GLFW/3.3.9.1": {
@@ -692,6 +757,27 @@
         "README.md",
         "silk.net.2.17.1.nupkg.sha512",
         "silk.net.nuspec",
+        "silkdotnet_v3.png"
+      ]
+    },
+    "Silk.NET.Assimp/2.18.0": {
+      "sha512": "CRgo7JKuRwOjJpPL79OFp4f9UTF2yjT15AIcbHIr8X/ekszWgom1Rx9Xf5dAJpQMDJnO3htFyg8Gh31sJaKE6w==",
+      "type": "package",
+      "path": "silk.net.assimp/2.18.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net5.0/Silk.NET.Assimp.dll",
+        "lib/net5.0/Silk.NET.Assimp.xml",
+        "lib/netcoreapp3.1/Silk.NET.Assimp.dll",
+        "lib/netcoreapp3.1/Silk.NET.Assimp.xml",
+        "lib/netstandard2.0/Silk.NET.Assimp.dll",
+        "lib/netstandard2.0/Silk.NET.Assimp.xml",
+        "lib/netstandard2.1/Silk.NET.Assimp.dll",
+        "lib/netstandard2.1/Silk.NET.Assimp.xml",
+        "silk.net.assimp.2.18.0.nupkg.sha512",
+        "silk.net.assimp.nuspec",
         "silkdotnet_v3.png"
       ]
     },
@@ -1073,6 +1159,22 @@
         "silkdotnet_v3.png"
       ]
     },
+    "SixLabors.ImageSharp/3.0.2": {
+      "sha512": "PlwUHnLZ67G1i0xXDYQJYbFiJsvXiEFWtKdV0QvY9j+dFasYbl+vWXXY42/asTsNjchsH5BLuoRzlf8Fa8lzpg==",
+      "type": "package",
+      "path": "sixlabors.imagesharp/3.0.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "build/SixLabors.ImageSharp.props",
+        "lib/net6.0/SixLabors.ImageSharp.dll",
+        "lib/net6.0/SixLabors.ImageSharp.xml",
+        "sixlabors.imagesharp.128.png",
+        "sixlabors.imagesharp.3.0.2.nupkg.sha512",
+        "sixlabors.imagesharp.nuspec"
+      ]
+    },
     "StbImageSharp/2.27.13": {
       "sha512": "tHnP2RHgFzWbOS96UqvRO/LYU1WmpMT1bKiig45we+rpaXacBr11Fq2IBF+MqlgyLyNXxRz18E66qr4R9YlSbg==",
       "type": "package",
@@ -1314,6 +1416,27 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "Ultz.Native.Assimp/5.3.1": {
+      "sha512": "tHtrz88fhXPZAj0Szd/rpf0d2mmDNYKs+GhPH8Aoyo7TgyMndKrzMyA/6vK/5fwE0hV5Padsa2quZKTNAn++YQ==",
+      "type": "package",
+      "path": "ultz.native.assimp/5.3.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "build/net461/Ultz.Native.Assimp.targets",
+        "lib/net461/_._",
+        "lib/netstandard2.0/_._",
+        "runtimes/linux-x64/native/libassimp.so.5",
+        "runtimes/osx-arm64/native/libassimp.5.dylib",
+        "runtimes/osx-x64/native/libassimp.5.dylib",
+        "runtimes/win-x64/native/Assimp64.dll",
+        "runtimes/win-x86/native/Assimp32.dll",
+        "silkdotnet_v3.png",
+        "ultz.native.assimp.5.3.1.nupkg.sha512",
+        "ultz.native.assimp.nuspec"
+      ]
+    },
     "Ultz.Native.GLFW/3.3.9.1": {
       "sha512": "wkqVEmYbIsp34ApLXu0+tqsypsB7jvsy4kng8nlcnGnpwpt67yKwg87X76tQpzI4XJBCCLDnE9yCM80LiGKmcg==",
       "type": "package",
@@ -1359,8 +1482,10 @@
   },
   "projectFileDependencyGroups": {
     "net7.0": [
+      "Silk.NET.Assimp >= 2.18.0",
       "Silk.NET.OpenGL.Extensions.ImGui >= 2.18.0",
       "Silk.Net >= 2.17.1",
+      "SixLabors.ImageSharp >= 3.0.2",
       "StbImageSharp >= 2.27.13"
     ]
   },
@@ -1409,6 +1534,10 @@
       "net7.0": {
         "targetAlias": "net7.0",
         "dependencies": {
+          "Silk.NET.Assimp": {
+            "target": "Package",
+            "version": "[2.18.0, )"
+          },
           "Silk.NET.OpenGL.Extensions.ImGui": {
             "target": "Package",
             "version": "[2.18.0, )"
@@ -1416,6 +1545,10 @@
           "Silk.Net": {
             "target": "Package",
             "version": "[2.17.1, )"
+          },
+          "SixLabors.ImageSharp": {
+            "target": "Package",
+            "version": "[3.0.2, )"
           },
           "StbImageSharp": {
             "target": "Package",

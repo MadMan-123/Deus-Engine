@@ -7,16 +7,19 @@ using static DeusEngine.RenderingEngine;
 
 class Program
 {
+        private static Model Cube = new Model("TestCube.fbx");
+
         class Bullet : Entity
         {
                 private Renderable _renderable;
-                
                 private float fSpeed = 0.5f;
 
                 public Bullet()
                 {
                         _renderable = AddComponent<Renderable>();
-
+                        _renderable.SetModel(Cube);
+                        _renderable.SetTexture(new Texture(Application.sAssetsPath + "Marat - Copy.jpg"));
+                        
                         transform.Scale = 0.05f;
                 }
                 public override void OnUpdate(double t)
@@ -31,7 +34,8 @@ class Program
                 public EntityOBJ()
                 {
                         _renderable = AddComponent<Renderable>();
-
+                        _renderable.SetModel(Cube);
+                        _renderable.SetTexture(new Texture(Application.sAssetsPath + "Marat - Copy.jpg"));
                 }
 
                 public override void OnUpdate(double t)
@@ -66,32 +70,32 @@ class Program
                         //set the fps
                         RenderingEngine.window.VSync = true;
 
-                        _camera.transform.Scale = 2f;
+                        _camera.transform.Position = new Vector3(0, 10, 0);
                 }
 
                 private Vector2 LastMousePos = Vector2.Zero;
                 bool isFirstRightMousePress = false;
-                
+                private float fSpeed = 5f;
                 public override void OnUpdate(double t)
                 {
                         entitys[0].transform.Position = new Vector3(0,MathF.Sin((float)(window.Time)) ,0);
 
                         if (IsKeyPressed(Key.W))
                         {
-                                _camera.transform.Position +=  _camera.transform.Forward * (float)t;
+                                _camera.transform.Position +=  _camera.transform.Forward *  fSpeed * (float)t;
                         }
                         else if (IsKeyPressed(Key.S))
                         {
-                                _camera.transform.Position -= _camera.transform.Forward * (float)t;
+                                _camera.transform.Position -= _camera.transform.Forward * fSpeed * (float)t;
                         }
                         if (IsKeyPressed(Key.A))
                         {
-                                _camera.transform.Position += _camera.transform.Right * (float)t;
+                                _camera.transform.Position += _camera.transform.Right * fSpeed * (float)t;
 
                         }
                         else if (IsKeyPressed(Key.D))
                         {
-                                _camera.transform.Position -= _camera.transform.Right * (float)t;
+                                _camera.transform.Position -= _camera.transform.Right * fSpeed * (float)t;
 
                         }
 

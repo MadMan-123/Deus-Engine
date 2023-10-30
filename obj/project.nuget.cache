@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "XfW7sC3Xt9ukj2NBPgxrbbAmd0zOa0jPggIPCOftnFtfdxDu/WVRfyXRHUQmSftx8OvOJHSlg3+3xtefW7bwPQ==",
+  "dgSpecHash": "8RUQY0xOY7HeXfKzsqfX6isri66qcRiBkNHivpLbBmKHUqATWnkh+zIEeRh/veeNqg+L/+IBfve4YQk2qVFQNA==",
   "success": true,
   "projectFilePath": "F:\\Dev\\Deus-Engine\\DeusEngine.csproj",
   "expectedPackageFiles": [
@@ -9,6 +9,7 @@
     "C:\\Users\\Madoc\\.nuget\\packages\\microsoft.dotnet.platformabstractions\\3.1.6\\microsoft.dotnet.platformabstractions.3.1.6.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\microsoft.extensions.dependencymodel\\7.0.0\\microsoft.extensions.dependencymodel.7.0.0.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\silk.net\\2.17.1\\silk.net.2.17.1.nupkg.sha512",
+    "C:\\Users\\Madoc\\.nuget\\packages\\silk.net.assimp\\2.18.0\\silk.net.assimp.2.18.0.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\silk.net.core\\2.18.0\\silk.net.core.2.18.0.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\silk.net.glfw\\2.17.1\\silk.net.glfw.2.17.1.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\silk.net.input\\2.17.1\\silk.net.input.2.17.1.nupkg.sha512",
@@ -27,6 +28,7 @@
     "C:\\Users\\Madoc\\.nuget\\packages\\silk.net.windowing.common\\2.18.0\\silk.net.windowing.common.2.18.0.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\silk.net.windowing.glfw\\2.17.1\\silk.net.windowing.glfw.2.17.1.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\silk.net.windowing.sdl\\2.17.1\\silk.net.windowing.sdl.2.17.1.nupkg.sha512",
+    "C:\\Users\\Madoc\\.nuget\\packages\\sixlabors.imagesharp\\3.0.2\\sixlabors.imagesharp.3.0.2.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\stbimagesharp\\2.27.13\\stbimagesharp.2.27.13.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\system.memory\\4.5.5\\system.memory.4.5.5.nupkg.sha512",
@@ -34,6 +36,7 @@
     "C:\\Users\\Madoc\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\system.text.encodings.web\\7.0.0\\system.text.encodings.web.7.0.0.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\system.text.json\\7.0.0\\system.text.json.7.0.0.nupkg.sha512",
+    "C:\\Users\\Madoc\\.nuget\\packages\\ultz.native.assimp\\5.3.1\\ultz.native.assimp.5.3.1.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\ultz.native.glfw\\3.3.9.1\\ultz.native.glfw.3.3.9.1.nupkg.sha512",
     "C:\\Users\\Madoc\\.nuget\\packages\\ultz.native.sdl\\2.24.3.1\\ultz.native.sdl.2.24.3.1.nupkg.sha512"
   ],

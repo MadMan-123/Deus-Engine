@@ -99,7 +99,7 @@ namespace DeusEngine
             }
         }
 
-        public static string sAssetsPath = sCurrentProjectPath + "/Assets/";
+        public static string sAssetsPath = sCurrentProjectPath + "\\Assets\\";
 
 
         

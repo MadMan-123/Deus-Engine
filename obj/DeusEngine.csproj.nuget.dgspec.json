@@ -45,6 +45,10 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
+            "Silk.NET.Assimp": {
+              "target": "Package",
+              "version": "[2.18.0, )"
+            },
             "Silk.NET.OpenGL.Extensions.ImGui": {
               "target": "Package",
               "version": "[2.18.0, )"
@@ -52,6 +56,10 @@
             "Silk.Net": {
               "target": "Package",
               "version": "[2.17.1, )"
+            },
+            "SixLabors.ImageSharp": {
+              "target": "Package",
+              "version": "[3.0.2, )"
             },
             "StbImageSharp": {
               "target": "Package",
