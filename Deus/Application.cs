@@ -69,8 +69,10 @@ namespace DeusEngine
         //static public Font BaseFont = new Font("F:\\Dev\\Deus-Engine\\Deus\\consolas\\consola.ttf");
         
         protected static bool bShouldLog = true;
-        public Vector2 MousePosition = new Vector2();
+        public static Vector2 MousePosition = new Vector2();
+        public static int MouseScroll = 0;
 
+        private ImGuiManager imguiManager;
         // Constructor
         public Application()
         {
@@ -80,6 +82,8 @@ namespace DeusEngine
             colliderManager = new ColliderManager();
             renderingEngine = new RenderingEngine();
             OnInit();
+            //imguiManager = new ImGuiManager();
+
 
         }
         
@@ -101,6 +105,7 @@ namespace DeusEngine
         {
             RenderingEngine.window.Load += HandleLoad;
             RenderingEngine.window.Update += HandleUpdate;
+            
         }
         
         // Size of the text displayed
@@ -112,8 +117,9 @@ namespace DeusEngine
 
 
         // Event handler for window close
-        void HandleClose(object sender, EventArgs e)
+        public void HandleClose()
         {
+            //imguiManager.Dispose();
             OnEnd();
             Entities.CleanUp();
             RenderingEngine.window.Close();
@@ -161,6 +167,8 @@ namespace DeusEngine
             {
                 RenderingEngine.window.Title = $"FPS:{timer.FPS}, Size:{RenderingEngine.window.Size}, Entities:{Entities.Entities.Count}";
             }
+            //imguiManager.OnUpdate(t);
+            
             OnUpdate(t);
             timer.Frame();
 
@@ -175,6 +183,7 @@ namespace DeusEngine
                 input.Mice[0]
                 );
 
+            //imguiManager.OnLoad();
             OnLoad();
         }
         
@@ -184,11 +193,7 @@ namespace DeusEngine
         public virtual void OnLoad() { }
         public virtual void OnInit() { }
         public virtual void OnEnd() { }
-
-        public void KeyDown(IKeyboard arg1, Key arg2, int arg3)
-        {
-            
-        }
+        
         
         // DrawRect function to draw a colored rectangle using vertices
         public static void DrawRect( float x, float y, float width, float height)
@@ -205,6 +210,8 @@ namespace DeusEngine
         {
             return InputManager.Instance.IsMouseButtonDown(button);
         }
+
+
     }
     #endregion
 }

@@ -8,7 +8,7 @@ namespace DeusEngine
     {
         // Position
         public Vector3 Position = new Vector3(0, 0,0);
-        public Vector3 Front
+        public Vector3 Forward
         {
             get
             {
@@ -19,7 +19,7 @@ namespace DeusEngine
             get
             {
                 //calculate the right vector
-                return Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY));
+                return (Vector3.Normalize(Vector3.Cross(Forward, Vector3.UnitY)));
             }
             
         }
@@ -28,7 +28,7 @@ namespace DeusEngine
         {
             get
             {
-                return Vector3.Cross(Front, Right);
+                return Vector3.Cross(Forward, Right);
 
             }
         }
@@ -36,7 +36,9 @@ namespace DeusEngine
         // Size
         public float Scale = 1f;
 
-        public Quaternion Rotation { get; set; } = Quaternion.Identity;
+        public Quaternion Rotation { get; set; } = Quaternion.CreateFromYawPitchRoll(0, 0, 0);
+            
+
 
         //Note: The order here does matter.
         public Matrix4x4 ViewMatrix => Matrix4x4.Identity * Matrix4x4.CreateFromQuaternion(Rotation) * Matrix4x4.CreateScale(Scale) * Matrix4x4.CreateTranslation(Position);

@@ -2,6 +2,46 @@
   "version": 3,
   "targets": {
     "net7.0": {
+      "ImGui.NET/1.89.7.1": {
+        "type": "package",
+        "dependencies": {
+          "System.Buffers": "4.4.0",
+          "System.Numerics.Vectors": "4.4.0",
+          "System.Runtime.CompilerServices.Unsafe": "4.4.0"
+        },
+        "compile": {
+          "lib/net6.0/ImGui.NET.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/ImGui.NET.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/libcimgui.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/osx/native/libcimgui.dylib": {
+            "assetType": "native",
+            "rid": "osx"
+          },
+          "runtimes/win-arm64/native/cimgui.dll": {
+            "assetType": "native",
+            "rid": "win-arm64"
+          },
+          "runtimes/win-x64/native/cimgui.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/cimgui.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          }
+        }
+      },
       "Microsoft.CSharp/4.7.0": {
         "type": "package",
         "compile": {
@@ -57,7 +97,7 @@
           "Silk.NET.Windowing": "2.17.1"
         }
       },
-      "Silk.NET.Core/2.17.1": {
+      "Silk.NET.Core/2.18.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.CSharp": "4.7.0",
@@ -103,10 +143,10 @@
           "Silk.NET.Input.Sdl": "2.17.1"
         }
       },
-      "Silk.NET.Input.Common/2.17.1": {
+      "Silk.NET.Input.Common/2.18.0": {
         "type": "package",
         "dependencies": {
-          "Silk.NET.Windowing.Common": "2.17.1"
+          "Silk.NET.Windowing.Common": "2.18.0"
         },
         "compile": {
           "lib/net5.0/Silk.NET.Input.Common.dll": {
@@ -115,6 +155,22 @@
         },
         "runtime": {
           "lib/net5.0/Silk.NET.Input.Common.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Silk.NET.Input.Extensions/2.18.0": {
+        "type": "package",
+        "dependencies": {
+          "Silk.NET.Input.Common": "2.18.0"
+        },
+        "compile": {
+          "lib/net5.0/Silk.NET.Input.Extensions.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net5.0/Silk.NET.Input.Extensions.dll": {
             "related": ".xml"
           }
         }
@@ -153,7 +209,7 @@
           }
         }
       },
-      "Silk.NET.Maths/2.17.1": {
+      "Silk.NET.Maths/2.18.0": {
         "type": "package",
         "compile": {
           "lib/net5.0/Silk.NET.Maths.dll": {
@@ -184,11 +240,11 @@
           }
         }
       },
-      "Silk.NET.OpenGL/2.17.1": {
+      "Silk.NET.OpenGL/2.18.0": {
         "type": "package",
         "dependencies": {
-          "Silk.NET.Core": "2.17.1",
-          "Silk.NET.Maths": "2.17.1"
+          "Silk.NET.Core": "2.18.0",
+          "Silk.NET.Maths": "2.18.0"
         },
         "compile": {
           "lib/net5.0/Silk.NET.OpenGL.dll": {
@@ -197,6 +253,26 @@
         },
         "runtime": {
           "lib/net5.0/Silk.NET.OpenGL.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Silk.NET.OpenGL.Extensions.ImGui/2.18.0": {
+        "type": "package",
+        "dependencies": {
+          "ImGui.NET": "1.89.7.1",
+          "Silk.NET.Input.Common": "2.18.0",
+          "Silk.NET.Input.Extensions": "2.18.0",
+          "Silk.NET.OpenGL": "2.18.0",
+          "Silk.NET.Windowing.Common": "2.18.0"
+        },
+        "compile": {
+          "lib/net5.0/Silk.NET.OpenGL.Extensions.ImGui.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net5.0/Silk.NET.OpenGL.Extensions.ImGui.dll": {
             "related": ".xml"
           }
         }
@@ -259,11 +335,11 @@
           "Silk.NET.Windowing.Glfw": "2.17.1"
         }
       },
-      "Silk.NET.Windowing.Common/2.17.1": {
+      "Silk.NET.Windowing.Common/2.18.0": {
         "type": "package",
         "dependencies": {
-          "Silk.NET.Core": "2.17.1",
-          "Silk.NET.Maths": "2.17.1"
+          "Silk.NET.Core": "2.18.0",
+          "Silk.NET.Maths": "2.18.0"
         },
         "compile": {
           "lib/netstandard2.1/Silk.NET.Windowing.Common.dll": {
@@ -468,6 +544,27 @@
     }
   },
   "libraries": {
+    "ImGui.NET/1.89.7.1": {
+      "sha512": "e7hAn3Jq4uoiAeQMmxAu9jkdSJnGR74qO1HNVF7wwIq7g6H9tBIDWke72sHbwGOXpZtL1/S678dR5j7VbDzt9A==",
+      "type": "package",
+      "path": "imgui.net/1.89.7.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/net40/ImGui.NET.targets",
+        "imgui.net.1.89.7.1.nupkg.sha512",
+        "imgui.net.nuspec",
+        "lib/net6.0/ImGui.NET.dll",
+        "lib/net6.0/ImGui.NET.xml",
+        "lib/netstandard2.0/ImGui.NET.dll",
+        "lib/netstandard2.0/ImGui.NET.xml",
+        "runtimes/linux-x64/native/libcimgui.so",
+        "runtimes/osx/native/libcimgui.dylib",
+        "runtimes/win-arm64/native/cimgui.dll",
+        "runtimes/win-x64/native/cimgui.dll",
+        "runtimes/win-x86/native/cimgui.dll"
+      ]
+    },
     "Microsoft.CSharp/4.7.0": {
       "sha512": "pTj+D3uJWyN3My70i2Hqo+OXixq3Os2D1nJ2x92FFo6sk8fYS1m1WLNTs0Dc1uPaViH0YvEEwvzddQ7y4rhXmA==",
       "type": "package",
@@ -598,10 +695,10 @@
         "silkdotnet_v3.png"
       ]
     },
-    "Silk.NET.Core/2.17.1": {
-      "sha512": "x/Xfv7+UlbWjNqrxocxHu32Ypgmqnw4q5xRXUj8vjrMsDTWkyEFBSaDnmcjWSSDiZ8TJDfsmCYLxjj7OdHNHbw==",
+    "Silk.NET.Core/2.18.0": {
+      "sha512": "KUxkzbn2jFUFQf/rXOBJ3JDmPKNioqrXMQS3c0NtzV7V/po74HYa08BMsSImRYl/5yPtwo1ArPM9IIdKupYo+A==",
       "type": "package",
-      "path": "silk.net.core/2.17.1",
+      "path": "silk.net.core/2.18.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -616,7 +713,7 @@
         "lib/netstandard2.0/Silk.NET.Core.xml",
         "lib/netstandard2.1/Silk.NET.Core.dll",
         "lib/netstandard2.1/Silk.NET.Core.xml",
-        "silk.net.core.2.17.1.nupkg.sha512",
+        "silk.net.core.2.18.0.nupkg.sha512",
         "silk.net.core.nuspec",
         "silkdotnet_v3.png"
       ]
@@ -655,10 +752,10 @@
         "silkdotnet_v3.png"
       ]
     },
-    "Silk.NET.Input.Common/2.17.1": {
-      "sha512": "4OSdkvt+DhNOan1FnmmqHKvlLhUvZaweZTFIMEtfsiEq5J/gwqzFZDajNQJshInm+7KIfpYEkhl6vhJ40srryg==",
+    "Silk.NET.Input.Common/2.18.0": {
+      "sha512": "Pfv3+UEZTMC3mWO/2RzI5NqjS/Abczo0Fqdcu34TgDpXRnfh0S8DLe28eUfOOLpCiXZx4OaiwMKdtxvRQo60ng==",
       "type": "package",
-      "path": "silk.net.input.common/2.17.1",
+      "path": "silk.net.input.common/2.18.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -671,8 +768,29 @@
         "lib/netstandard2.0/Silk.NET.Input.Common.xml",
         "lib/netstandard2.1/Silk.NET.Input.Common.dll",
         "lib/netstandard2.1/Silk.NET.Input.Common.xml",
-        "silk.net.input.common.2.17.1.nupkg.sha512",
+        "silk.net.input.common.2.18.0.nupkg.sha512",
         "silk.net.input.common.nuspec",
+        "silkdotnet_v3.png"
+      ]
+    },
+    "Silk.NET.Input.Extensions/2.18.0": {
+      "sha512": "TCeVgNQWgW/lysoGMYJxEaZDeFzEsClAMSUM/uZPh7+SGAiWi+y1kgObCRYqEz3a1c7P2iQ5xGKDRh3n9M/v5A==",
+      "type": "package",
+      "path": "silk.net.input.extensions/2.18.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net5.0/Silk.NET.Input.Extensions.dll",
+        "lib/net5.0/Silk.NET.Input.Extensions.xml",
+        "lib/netcoreapp3.1/Silk.NET.Input.Extensions.dll",
+        "lib/netcoreapp3.1/Silk.NET.Input.Extensions.xml",
+        "lib/netstandard2.0/Silk.NET.Input.Extensions.dll",
+        "lib/netstandard2.0/Silk.NET.Input.Extensions.xml",
+        "lib/netstandard2.1/Silk.NET.Input.Extensions.dll",
+        "lib/netstandard2.1/Silk.NET.Input.Extensions.xml",
+        "silk.net.input.extensions.2.18.0.nupkg.sha512",
+        "silk.net.input.extensions.nuspec",
         "silkdotnet_v3.png"
       ]
     },
@@ -718,10 +836,10 @@
         "silkdotnet_v3.png"
       ]
     },
-    "Silk.NET.Maths/2.17.1": {
-      "sha512": "i+0dW0cVTaAfal8qGPGHpK25NS479bZC7INHa0b7c9AxUWeBBUDnhVIU1LgVuRMqDI9mi0Uu2wP95Ae9fk7vMQ==",
+    "Silk.NET.Maths/2.18.0": {
+      "sha512": "bMu0sh58HYZfixi7ruqTNF4Al1n9WbeZlBfdzmMsUaEH3pdgxFVVr2uvfD5QGula6VaX/nGqX0giKXjRqStdGA==",
       "type": "package",
-      "path": "silk.net.maths/2.17.1",
+      "path": "silk.net.maths/2.18.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -738,7 +856,7 @@
         "lib/netstandard2.0/Silk.NET.Maths.xml",
         "lib/netstandard2.1/Silk.NET.Maths.dll",
         "lib/netstandard2.1/Silk.NET.Maths.xml",
-        "silk.net.maths.2.17.1.nupkg.sha512",
+        "silk.net.maths.2.18.0.nupkg.sha512",
         "silk.net.maths.nuspec",
         "silkdotnet_v3.png"
       ]
@@ -764,10 +882,10 @@
         "silkdotnet_v3.png"
       ]
     },
-    "Silk.NET.OpenGL/2.17.1": {
-      "sha512": "cQW4i0KL8ASjMNkpR/GTHbbG1cSFxZHNUSISwzdPmMxkj6LFxF5M6o6zhcMHi3LV3zRN5+5/Lp/WsfVOW2QO2w==",
+    "Silk.NET.OpenGL/2.18.0": {
+      "sha512": "jZAxvH9CoJe5gWdO8lo+VXFYHkGc7n8nUqAnNkPEEt6yzKNkUA88RQr7rcOAfu0b2TiEqtlAXaD2rHZB/otMAA==",
       "type": "package",
-      "path": "silk.net.opengl/2.17.1",
+      "path": "silk.net.opengl/2.18.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -780,8 +898,29 @@
         "lib/netstandard2.0/Silk.NET.OpenGL.xml",
         "lib/netstandard2.1/Silk.NET.OpenGL.dll",
         "lib/netstandard2.1/Silk.NET.OpenGL.xml",
-        "silk.net.opengl.2.17.1.nupkg.sha512",
+        "silk.net.opengl.2.18.0.nupkg.sha512",
         "silk.net.opengl.nuspec",
+        "silkdotnet_v3.png"
+      ]
+    },
+    "Silk.NET.OpenGL.Extensions.ImGui/2.18.0": {
+      "sha512": "pUjpmor9S9vzhkZeUqoV2DpA4qJaFw8LyFNR+Yp2IFYiLBB6VHuvMav7Ww2LJfo+1IhU6NjtLXmI7ESqAhjcAA==",
+      "type": "package",
+      "path": "silk.net.opengl.extensions.imgui/2.18.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net5.0/Silk.NET.OpenGL.Extensions.ImGui.dll",
+        "lib/net5.0/Silk.NET.OpenGL.Extensions.ImGui.xml",
+        "lib/netcoreapp3.1/Silk.NET.OpenGL.Extensions.ImGui.dll",
+        "lib/netcoreapp3.1/Silk.NET.OpenGL.Extensions.ImGui.xml",
+        "lib/netstandard2.0/Silk.NET.OpenGL.Extensions.ImGui.dll",
+        "lib/netstandard2.0/Silk.NET.OpenGL.Extensions.ImGui.xml",
+        "lib/netstandard2.1/Silk.NET.OpenGL.Extensions.ImGui.dll",
+        "lib/netstandard2.1/Silk.NET.OpenGL.Extensions.ImGui.xml",
+        "silk.net.opengl.extensions.imgui.2.18.0.nupkg.sha512",
+        "silk.net.opengl.extensions.imgui.nuspec",
         "silkdotnet_v3.png"
       ]
     },
@@ -861,10 +1000,10 @@
         "silkdotnet_v3.png"
       ]
     },
-    "Silk.NET.Windowing.Common/2.17.1": {
-      "sha512": "b+df6EHSx4ZQLlCVNrJB9eBvo5cdGS+VEEvBbtQ63FJtGuz1pQfQc/2Vn3J+OJ2dwdE7BTzH+ATo9qPz5dPPOg==",
+    "Silk.NET.Windowing.Common/2.18.0": {
+      "sha512": "wQmoFny4NhNKkSYe/WuxpdiIItDeRvvno9rUJBhvucL5F7jAd03EC2wYRRe73P6D8qqTGSMVLDIg1ztoLNBU5g==",
       "type": "package",
-      "path": "silk.net.windowing.common/2.17.1",
+      "path": "silk.net.windowing.common/2.18.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -873,7 +1012,7 @@
         "lib/netstandard2.0/Silk.NET.Windowing.Common.xml",
         "lib/netstandard2.1/Silk.NET.Windowing.Common.dll",
         "lib/netstandard2.1/Silk.NET.Windowing.Common.xml",
-        "silk.net.windowing.common.2.17.1.nupkg.sha512",
+        "silk.net.windowing.common.2.18.0.nupkg.sha512",
         "silk.net.windowing.common.nuspec",
         "silkdotnet_v3.png"
       ]
@@ -1220,6 +1359,7 @@
   },
   "projectFileDependencyGroups": {
     "net7.0": [
+      "Silk.NET.OpenGL.Extensions.ImGui >= 2.18.0",
       "Silk.Net >= 2.17.1",
       "StbImageSharp >= 2.27.13"
     ]
@@ -1269,6 +1409,10 @@
       "net7.0": {
         "targetAlias": "net7.0",
         "dependencies": {
+          "Silk.NET.OpenGL.Extensions.ImGui": {
+            "target": "Package",
+            "version": "[2.18.0, )"
+          },
           "Silk.Net": {
             "target": "Package",
             "version": "[2.17.1, )"

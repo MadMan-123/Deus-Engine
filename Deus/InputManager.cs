@@ -7,11 +7,15 @@ public class InputManager
 {
     public static InputManager Instance;
 
-    private IKeyboard CurrentKeyboard;
-    private IMouse CurrentMouse;
+    public IKeyboard CurrentKeyboard;
+    public IMouse CurrentMouse;
+    public IInputContext CurrentInputContext;
     private Dictionary<Key, bool> KeyStates;
     private Dictionary<MouseButton, bool> MouseButtonStates;
     private Vector2 MousePosition;
+    private int iMouseScrollState = 0;
+    private bool bMouseScroll = false;
+    
 
     public InputManager(IKeyboard keyboard, IMouse mouse)
     {
@@ -21,7 +25,8 @@ public class InputManager
         //set the keyboard
         CurrentKeyboard = keyboard;
         CurrentMouse = mouse;
-
+        CurrentInputContext = RenderingEngine.window.CreateInput();
+        
         KeyStates = new Dictionary<Key, bool>();
         MouseButtonStates = new Dictionary<MouseButton, bool>();
 
@@ -43,12 +48,23 @@ public class InputManager
         CurrentMouse.MouseDown += MouseDown;
         CurrentMouse.MouseUp += MouseUp;
         CurrentMouse.MouseMove += MouseMove;
+        CurrentMouse.Scroll += MouseScroll;
+        
+    }
+
+    private void MouseScroll(IMouse arg1, ScrollWheel arg2)
+    {
+        iMouseScrollState = (int)arg2.Y;
+        
+        bMouseScroll = true;
+        Application.MouseScroll = iMouseScrollState;
+        
     }
 
     private void MouseMove(IMouse mouse, Vector2 Position)
     {
         MousePosition = Position;
-        Application.Instance.MousePosition = MousePosition;
+        Application.MousePosition = MousePosition;
     }
 
     private void MouseUp(IMouse mouse, MouseButton button)

@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+﻿﻿using System.Numerics;
 
 namespace DeusEngine;
 
@@ -6,25 +6,22 @@ public class Camera
 {
     public static Camera Main;
     //Setup the camera's location, and relative up and right directions
-    public Vector3 Position { get; set; }
-    public Vector3 Front { get; set; }
-    public Vector3 Right { get; set; }
-    public Vector3 Up { get; private set; }
-    
+    public Transform transform = new Transform();
     public float AspectRatio { get; set; }
-
     public float Yaw { get; set; } = -90f;
     public float Pitch { get; set; }
 
     private float Zoom = 90f;
 
-    public Quaternion Rotation;
-    public Camera(Vector3 position, Vector3 front, Vector3 up, float aspectRatio)
+    public Camera(Vector3 position, Vector3 Forward, Vector3 up, float aspectRatio)
     {
-        Position = position;
+        transform.Position = position;
         AspectRatio = aspectRatio;
-        Front = front;
-        Up = up;
+        //transform.Forward = Forward;
+        //transform.Up = up;
+        //initialise the quanternion with the camera's Forward vector
+        ModifyDirection(0, 0);
+
     }
 
     public static void SetMain(ref Camera NewMainCamera)
@@ -36,6 +33,11 @@ public class Camera
     {
         //We don't want to be able to zoom in too close or too far away so clamp to these values
         Zoom = Math.Clamp(Zoom - zoomAmount, 1.0f, 45f);
+    }
+
+    public void ModifyScale()
+    {
+        
     }
 
     public void ModifyDirection(float xOffset, float yOffset)
@@ -53,16 +55,16 @@ public class Camera
         cameraDirection.Y = MathF.Sin(DMath.DegToRad(Pitch));
         cameraDirection.Z = MathF.Sin(DMath.DegToRad(Yaw)) * MathF.Cos(DMath.DegToRad(Pitch));
 
-        Rotation = new Quaternion(cameraDirection.X,cameraDirection.Y, cameraDirection.Z, 1f);
-        Front = Vector3.Normalize(cameraDirection);
+        transform.Rotation = new Quaternion(cameraDirection.X,cameraDirection.Y, cameraDirection.Z, 1f);
+        //Forward = Vector3.Normalize(cameraDirection);
     }
 
     public Matrix4x4 GetViewMatrix()
     {
         return Matrix4x4.CreateLookAt(
-            Position, 
-            Position + Front,
-            Up);
+            transform.Position, 
+            transform.Position + transform.Forward,
+            transform.Up);
     }
 
     public Matrix4x4 GetProjectionMatrix()

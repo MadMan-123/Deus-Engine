@@ -406,3 +406,11 @@ F:\Dev\Deus-Engine\Build\Debug\net7.0\runtimes\linux-x64\native\libSDL2-2.0.so
 F:\Dev\Deus-Engine\Build\Debug\net7.0\runtimes\osx-x64\native\libSDL2-2.0.dylib
 F:\Dev\Deus-Engine\Build\Debug\net7.0\runtimes\win-arm64\native\SDL2.dll
 F:\Dev\Deus-Engine\Build\Debug\net7.0\runtimes\win-x64\native\SDL2.dll
+F:\Dev\Deus-Engine\Build\Debug\net7.0\ImGui.NET.dll
+F:\Dev\Deus-Engine\Build\Debug\net7.0\Silk.NET.Input.Extensions.dll
+F:\Dev\Deus-Engine\Build\Debug\net7.0\Silk.NET.OpenGL.Extensions.ImGui.dll
+F:\Dev\Deus-Engine\Build\Debug\net7.0\runtimes\linux-x64\native\libcimgui.so
+F:\Dev\Deus-Engine\Build\Debug\net7.0\runtimes\osx\native\libcimgui.dylib
+F:\Dev\Deus-Engine\Build\Debug\net7.0\runtimes\win-arm64\native\cimgui.dll
+F:\Dev\Deus-Engine\Build\Debug\net7.0\runtimes\win-x64\native\cimgui.dll
+F:\Dev\Deus-Engine\Build\Debug\net7.0\runtimes\win-x86\native\cimgui.dll

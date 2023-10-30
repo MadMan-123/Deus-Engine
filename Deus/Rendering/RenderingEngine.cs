@@ -37,6 +37,7 @@ public class RenderingEngine
                 
         window.Render += OnRender;
         window.Closing += OnClose;
+        window.Closing += Application.Instance.HandleClose;
         window.Load += OnLoad;
         window.Resize += OnResize;
 
@@ -55,7 +56,6 @@ public class RenderingEngine
     private void OnLoad()
     {
         Gl = GL.GetApi(window);
-
     }
     
     public void OnStart()
@@ -88,7 +88,6 @@ public class RenderingEngine
 
     void OnClose()
     {
-
         for (int i = 0; i < _renderables.Count; i++)
         {
             _renderables[i].OnDestroy();

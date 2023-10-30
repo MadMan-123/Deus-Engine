@@ -1,4 +1,4 @@
-﻿
+﻿﻿
 using System.Numerics;
 using DeusEngine;
 using Silk.NET.Input;
@@ -10,7 +10,7 @@ class Program
         class Bullet : Entity
         {
                 private Renderable _renderable;
-
+                
                 private float fSpeed = 0.5f;
 
                 public Bullet()
@@ -21,7 +21,7 @@ class Program
                 }
                 public override void OnUpdate(double t)
                 {
-                        transform.Position += transform.Front * fSpeed * (float)t;
+                        transform.Position += transform.Forward * fSpeed * (float)t;
 
                 }
         }
@@ -62,37 +62,42 @@ class Program
                         }
                         _camera = new Camera(Vector3.UnitZ * 6, Vector3.UnitZ * -1, Vector3.UnitY, window.Size.X / window.Size.Y);
                         Camera.SetMain(ref _camera);
+                        
+                        //set the fps
+                        RenderingEngine.window.VSync = true;
+
+                        _camera.transform.Scale = 2f;
                 }
 
                 private Vector2 LastMousePos = Vector2.Zero;
                 bool isFirstRightMousePress = false;
-
+                
                 public override void OnUpdate(double t)
                 {
                         entitys[0].transform.Position = new Vector3(0,MathF.Sin((float)(window.Time)) ,0);
 
                         if (IsKeyPressed(Key.W))
                         {
-                                _camera.Position += _camera.Front * (float)t;
+                                _camera.transform.Position +=  _camera.transform.Forward * (float)t;
                         }
                         else if (IsKeyPressed(Key.S))
                         {
-                                _camera.Position -= _camera.Front * (float)t;
+                                _camera.transform.Position -= _camera.transform.Forward * (float)t;
                         }
                         if (IsKeyPressed(Key.A))
                         {
-                                _camera.Position -= Vector3.Normalize(Vector3.Cross(_camera.Front, _camera.Up)) * (float)t;
+                                _camera.transform.Position += _camera.transform.Right * (float)t;
 
                         }
                         else if (IsKeyPressed(Key.D))
                         {
-                                _camera.Position += Vector3.Normalize(Vector3.Cross(_camera.Front, _camera.Up)) * (float)t;
+                                _camera.transform.Position -= _camera.transform.Right * (float)t;
 
                         }
 
                         if (IsMousePressed(MouseButton.Right))
                         {
-                                float lookSensitivity = 100f;
+                                float lookSensitivity = 10f;
                                 if (isFirstRightMousePress)
                                 {
                                         LastMousePos = MousePosition;
@@ -110,22 +115,50 @@ class Program
                                 isFirstRightMousePress = true;
                         }
 
-                        if (IsMousePressed(MouseButton.Left))
+                        //if the mouse wheel is scrolled, zoom in or out
+                        if(Application.MouseScroll != 0)
                         {
-                                //spawn a bullet at the camera's position and rotation 
-                                Bullet bullet = new Bullet();
-
-                                bullet.transform.Position = _camera.Position;
-                                bullet.transform.Rotation = _camera.Rotation;
-                                
-                                //log the rotation of the bullet    
-                                Log("Bullet Rotation: ");
-                                
-                                Instantiate(bullet);
+                                _camera.ModifyZoom(Application.MouseScroll);
+                        }
+                        
+                        if ( bShouldShoot && IsMousePressed(MouseButton.Left))
+                        {
+                                Shoot(1000);
                         }
                    
 
                 }
+                bool bShouldShoot = true;
+
+                private Quaternion DesiredRotation = Quaternion.Identity;
+                Quaternion RotationDelta = Quaternion.Identity;
+                //shoot cooroutine
+                async void Shoot(int iDelay)
+                {
+                        bShouldShoot = false;
+
+                        // Instantiate a bullet or create it as per your engine's requirements
+                        Bullet bullet = new Bullet(); 
+
+                        // Set the bullet's position to the camera's position
+                        bullet.transform.Position = _camera.transform.Position + (_camera.transform.Forward);
+
+                        // Set the desired rotation to the camera's rotation
+                        DesiredRotation = _camera.transform.Rotation;
+
+                        // Calculate the rotation delta
+                        RotationDelta = DesiredRotation * Quaternion.Inverse(bullet.transform.Rotation);
+
+                        // Apply the rotation delta to the bullet's rotation
+                        bullet.transform.Rotation = RotationDelta * bullet.transform.Rotation;
+
+                        // Spawn the bullet or instantiate it as per your engine's requirements
+                        Instantiate(bullet);
+
+                        await Task.Delay(iDelay);
+                        bShouldShoot = true;
+                }
+
         };
         static void Main()
         {
